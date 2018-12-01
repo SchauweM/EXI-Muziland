@@ -3,25 +3,42 @@
 // All of the Node.js APIs are available in this process.
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-const port = new SerialPort('/dev/cu.usbmodem14201', {
+const port = new SerialPort('/dev/cu.usbmodem14101', {
   baudRate: 1000000
 });
+let recording = false;
+let recordingCountdownSeconds = 4;
+let secondsLeft = recordingCountdownSeconds;
+let refreshIntervalId = null;
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 
 parser.on('data', function (data) {
   let dataconvert = JSON.parse(data.toString());
-  if (dataconvert["button-0"] == 1) {
-    document.querySelector('.title').innerHTML = 'First button pressed';
-  } else if (dataconvert["button-1"] == 1) {
-    document.querySelector('.title').innerHTML = 'Second button pressed';
-  } else if (dataconvert["button-2"] == 1) {
-    document.querySelector('.title').innerHTML = 'Third button pressed';
-  } else if (dataconvert["button-3"] == 1) {
-    document.querySelector('.title').innerHTML = 'Fourth button pressed';
+  if (recording === false) {
+    startRecordHandler(Object.keys(dataconvert)[0]);
+  } else {
+    console.log(`already recording something`);
   }
 });
+
+const startRecordHandler = (key) => {
+  recording = true;
+  buttonId = parseInt(key.replace('button-', ''));
+  refreshIntervalId = setInterval(countDownTimer, 1000);
+}
+
+const countDownTimer = () => {
+  secondsLeft -= 1;
+  console.log(secondsLeft);
+  if (secondsLeft === 0) {
+    clearInterval(refreshIntervalId);
+    refreshIntervalId = null;
+    secondsLeft = recordingCountdownSeconds;
+    recording = false;
+  }
+}
 
 // Set up the scene, camera, and renderer as global variables.
 var scene, camera, renderer;
