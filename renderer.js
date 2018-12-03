@@ -10,6 +10,8 @@ let recording = false;
 let recordingCountdownSeconds = 4;
 let secondsLeft = recordingCountdownSeconds;
 let refreshIntervalId = null;
+let recordedSounds = [];
+let canvasUi = document.querySelector(`.canvas__ui`);
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -26,19 +28,106 @@ parser.on('data', function (data) {
 const startRecordHandler = (key) => {
   recording = true;
   buttonId = parseInt(key.replace('button-', ''));
-  refreshIntervalId = setInterval(countDownTimer, 1000);
+  canvasUi.innerHTML = "<div class='countdown__timer'><h2>Recording audio:</h2><p class='ui__countdown'></p></div>";
+  canvasUi.style.visibility = "visible";
+  canvasUi.style.opacity = "1";
+  refreshIntervalId = setInterval(() => {
+    countDownTimer(buttonId)
+  }, 1000);
 }
 
-const countDownTimer = () => {
+const countDownTimer = (buttonId) => {
   secondsLeft -= 1;
   console.log(secondsLeft);
+  document.querySelector(`.ui__countdown`).innerHTML = secondsLeft;
   if (secondsLeft === 0) {
     clearInterval(refreshIntervalId);
     refreshIntervalId = null;
     secondsLeft = recordingCountdownSeconds;
-    recording = false;
+    startRecording(buttonId);
   }
 }
+
+const startRecording = (buttonId) => {
+  navigator.mediaDevices.getUserMedia({ audio: true })
+  .then(stream => {
+
+    createWaveSurfer(stream);
+    const mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.start();
+
+    const audioChunks = [];
+    mediaRecorder.addEventListener("dataavailable", event => {
+      audioChunks.push(event.data);
+    });
+
+    mediaRecorder.addEventListener("stop", () => {
+      const audioBlob = new Blob(audioChunks);
+      const audioUrl = URL.createObjectURL(audioBlob);
+      recordedSounds[buttonId] = new Audio(audioUrl);
+      recording = false;
+      canvasUi.style.visibility = "hidden";
+      canvasUi.style.opacity = "0";
+    });
+
+    setTimeout(() => {
+      mediaRecorder.stop();
+      destroyWaveSurfer();
+    }, 3000);
+  });
+}
+
+let wave;
+let micContext;
+let mediaStreamSource;
+let levelChecker;
+
+const createWaveSurfer = (stream) => {
+
+    if (wave)
+        wave.destroy();
+
+    var wave = WaveSurfer.create({
+        container: '#waveform',
+        waveColor: '#FFF',
+        barHeight: 10,
+        hideScrollbar: true,
+        audioRate: 1,
+        barWidth: 1,
+        interact: false,
+    });
+
+    micContext = wave.backend.getAudioContext();
+    mediaStreamSource = micContext.createMediaStreamSource(stream);
+    levelChecker = micContext.createScriptProcessor(4096, 1, 1);
+
+    mediaStreamSource.connect(levelChecker);
+    levelChecker.connect(micContext.destination);
+
+    levelChecker.onaudioprocess = function (event) {
+        wave.empty();
+        wave.loadDecodedBuffer(event.inputBuffer);
+    };
+};
+
+const destroyWaveSurfer = () => {
+
+    if (wave) {
+        wave.destroy();
+        wave = undefined;
+    }
+
+    if (mediaStreamSource) {
+        mediaStreamSource.disconnect();
+        mediaStreamSource = undefined;
+    }
+
+    if (levelChecker) {
+        levelChecker.disconnect();
+        levelChecker.onaudioprocess = undefined;
+        levelChecker = undefined;
+    }
+};
 
 // Set up the scene, camera, and renderer as global variables.
 var scene, camera, renderer;
@@ -57,7 +146,7 @@ function init() {
   // Create a renderer and add it to the DOM.
   renderer = new THREE.WebGLRenderer({antialias:true});
   renderer.setSize(WIDTH, HEIGHT);
-  document.body.appendChild(renderer.domElement);
+  document.querySelector(`.canvas__wrapper`).appendChild(renderer.domElement);
   renderer.domElement.id = "context"
 
   // Create a camera, zoom it out from the model a bit, and add it to the scene.
