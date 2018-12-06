@@ -7,7 +7,7 @@ function createWindow () {
   mainWindow = new BrowserWindow({width: 800, height: 600})
   mainWindow.webContents.openDevTools();
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  mainWindow.loadFile('./src/index.html')
 
 
   mainWindow.setFullScreen(true);
@@ -34,7 +34,7 @@ app.on('ready', () => {
   globalShortcut.register('F', () => {
     mainWindow.setFullScreen(true);
   })
-});
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {

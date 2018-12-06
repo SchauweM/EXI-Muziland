@@ -52,13 +52,13 @@ function init() {
 
   scene = new THREE.Scene();
   var WIDTH = window.innerWidth,
-      HEIGHT = window.innerHeight;
+    HEIGHT = window.innerHeight;
 
   // Create a renderer and add it to the DOM.
   renderer = new THREE.WebGLRenderer({antialias:true});
   renderer.setSize(WIDTH, HEIGHT);
   document.body.appendChild(renderer.domElement);
-  renderer.domElement.id = "context"
+  renderer.domElement.id = 'context'
 
   // Create a camera, zoom it out from the model a bit, and add it to the scene.
   camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 20000);
