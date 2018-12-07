@@ -13,8 +13,50 @@ let refreshIntervalId = null;
 let recordedSounds = [];
 let canvasUi = document.querySelector(`.canvas__ui`);
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+
+// setting vars bars
+// We'll store the value of te bars we want to draw in here
+let bars = []
+
+// An instance of AudioContext
+const audioContext = new AudioContext();
+
+// This will become our input MediaStreamSourceNode
+let input = null;
+
+// This will become our AnalyserNode
+let analyser = null;
+
+// This will become our ScriptProcessorNode
+let scriptProcessor = null;
+
+// Canvas related variables
+const barWidth = 2;
+const barGutter = 2;
+const barColor = "#000";
+
+let canvas = null;
+let canvasContext = null;
+let width = 0;
+let height = 0;
+let halfHeight = 0;
+let drawing = false;
+
+canvas = document.querySelector('canvas');
+canvasContext = canvas.getContext('2d');
+
+// Set the dimensions
+width = canvas.offsetWidth;
+height = canvas.offsetHeight;
+halfHeight = height / 2;
+
+// Set the size of the canvas context to the size of the canvas element
+canvasContext.canvas.width = width;
+canvasContext.canvas.height = height;
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
+
 
 parser.on('data', function (data) {
   let dataconvert = JSON.parse(data.toString());
@@ -52,7 +94,21 @@ const startRecording = (buttonId) => {
   navigator.mediaDevices.getUserMedia({ audio: true })
   .then(stream => {
 
-    createWaveSurfer(stream);
+    input = audioContext.createMediaStreamSource(stream);
+    analyser = audioContext.createAnalyser();
+    scriptProcessor = audioContext.createScriptProcessor();
+
+    analyser.smoothingTimeConstant = 0.3;
+    analyser.fftSize = 1024;
+
+    // Connect the audio nodes
+    input.connect(analyser);
+    analyser.connect(scriptProcessor);
+    scriptProcessor.connect(audioContext.destination);
+
+    // Add an event handler
+    scriptProcessor.onaudioprocess = processInput;
+
     const mediaRecorder = new MediaRecorder(stream);
     mediaRecorder.start();
 
@@ -72,62 +128,15 @@ const startRecording = (buttonId) => {
 
     setTimeout(() => {
       mediaRecorder.stop();
-      destroyWaveSurfer();
-    }, 3000);
+      isRecording = false;
+      drawing = false;
+      console.log("stopped");
+      bars = [];
+      scriptProcessor.onaudioprocess = null;
+      renderBars(bars);
+    }, 1000);
   });
 }
-
-let wave;
-let micContext;
-let mediaStreamSource;
-let levelChecker;
-
-const createWaveSurfer = (stream) => {
-
-    if (wave)
-        wave.destroy();
-
-    var wave = WaveSurfer.create({
-        container: '#waveform',
-        waveColor: '#FFF',
-        barHeight: 10,
-        hideScrollbar: true,
-        audioRate: 1,
-        barWidth: 1,
-        interact: false,
-    });
-
-    micContext = wave.backend.getAudioContext();
-    mediaStreamSource = micContext.createMediaStreamSource(stream);
-    levelChecker = micContext.createScriptProcessor(4096, 1, 1);
-
-    mediaStreamSource.connect(levelChecker);
-    levelChecker.connect(micContext.destination);
-
-    levelChecker.onaudioprocess = function (event) {
-        wave.empty();
-        wave.loadDecodedBuffer(event.inputBuffer);
-    };
-};
-
-const destroyWaveSurfer = () => {
-
-    if (wave) {
-        wave.destroy();
-        wave = undefined;
-    }
-
-    if (mediaStreamSource) {
-        mediaStreamSource.disconnect();
-        mediaStreamSource = undefined;
-    }
-
-    if (levelChecker) {
-        levelChecker.disconnect();
-        levelChecker.onaudioprocess = undefined;
-        levelChecker = undefined;
-    }
-};
 
 // Set up the scene, camera, and renderer as global variables.
 var scene, camera, renderer;
@@ -176,4 +185,54 @@ function animate() {
   requestAnimationFrame( animate );
   renderer.render( scene, camera );
   controls.update();
+}
+
+const processInput = audioProcessingEvent => {  
+    // Create a new Uint8Array to store the analyser's frequencyBinCount 
+    const tempArray = new Uint8Array(analyser.frequencyBinCount);
+
+    // Get the byte frequency data from our array
+    analyser.getByteFrequencyData(tempArray);
+    
+    // Calculate the average volume and store that value in our bars Array
+    bars.push(getAverageVolume(tempArray));
+
+    // Render the bars
+    renderBars(bars);
+}
+
+const getAverageVolume = array => {    
+    const length = array.length;
+    let values = 0;
+    let i = 0;
+
+    // Loop over the values of the array, and count them
+    for (; i < length; i++) {
+        values += array[i];
+    }
+
+    // Return the avarag
+    return values / length;
+}
+
+const renderBars = () => {  
+    if (!drawing) {
+        drawing = true;
+
+        window.requestAnimationFrame(() => {
+            canvasContext.clearRect(0, 0, width, height);
+
+            bars.forEach((bar, index) => {
+                canvasContext.fillStyle = barColor;
+                
+                // Top part of the bar
+                canvasContext.fillRect((index * (barWidth + barGutter)), (halfHeight - (halfHeight * (bar / 100))), barWidth, (halfHeight * (bar / 100)));
+
+                // Bottom part of the bars
+                canvasContext.fillRect((index * (barWidth + barGutter)), halfHeight, barWidth, (halfHeight * (bar / 100)));
+            });
+
+            drawing = false;
+        });
+    }
 }
