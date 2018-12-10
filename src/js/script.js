@@ -3,8 +3,11 @@
 // All of the Node.js APIs are available in this process.
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-const port = new SerialPort('/dev/cu.usbmodem14101', {
+const port = new SerialPort('/dev/cu.usbmodem14201', {
   baudRate: 1000000
+});
+const portBlokken = new SerialPort('/dev/cu.usbmodem14101', {
+  baudRate: 9600
 });
 let recording = false;
 let recordingCountdownSeconds = 4;
@@ -12,16 +15,17 @@ let secondsLeft = recordingCountdownSeconds;
 let refreshIntervalId = null;
 let recordedSounds = [null, null, null, null];
 let placedBlocks = [
-  [0,1,0,1,0,1,1,0],
-  [1,0,1,1,0,1,0,1],
-  [0,0,0,1,1,1,0,1],
-  [0,1,0,1,0,1,1,0],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
 ]
 const steps = 8;
 const rows = 4;
 let currentStep = 0;
 let canvasUi = document.querySelector(`.canvas__ui`);
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+const parserBlokken = portBlokken.pipe(new Readline( { delimiter: '\r\n' }));
 
 // setting vars bars
 // We'll store the value of te bars we want to draw in here
@@ -67,7 +71,7 @@ canvasContext.canvas.height = height;
 // be closed automatically when the JavaScript object is garbage collected.
 
 
-parser.on('data', function (data) {
+parser.on('data', (data) => {
   let dataconvert = JSON.parse(data.toString());
   if (recording === false) {
     startRecordHandler(Object.keys(dataconvert)[0]);
@@ -75,6 +79,21 @@ parser.on('data', function (data) {
     console.log(`already recording something`);
   }
 });
+
+parserBlokken.on('data', (data) => {
+  let dataconvert = JSON.parse(data.toString());
+  changeBlock(dataconvert);
+})
+
+const changeBlock = (data) => {
+  for (let i = 0; i < Object.keys(data).length; i++) {
+    const keys = Object.keys(data)[i].split(':');
+    const value = data[Object.keys(data)[i]];
+    placedBlocks[keys[0]][keys[1]] = value;
+    console.log(`${keys[0]} : ${keys[1]} - ${value}`);
+  }
+  // console.log(data);
+}
 
 const startRecordHandler = (key) => {
   recording = true;
