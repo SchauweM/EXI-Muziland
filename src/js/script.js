@@ -21,7 +21,7 @@ let placedBlocks = [
   [0,0,0,0,0,0,0,0],
 ]
 const steps = 8;
-// const rows = 4;
+const rows = 4;
 let currentStep = 0;
 let canvasUi = document.querySelector(`.canvas__ui`);
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
@@ -170,7 +170,7 @@ const startRecording = (buttonId) => {
 }
 
 const playCurrentColumn = (step) => {
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < rows; i++) {
     if (placedBlocks[i][step] === 1) {
       if (recordedSounds[i] !== null) {
         console.log(`playing ${step} + ${i}`);
