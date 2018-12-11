@@ -120,53 +120,53 @@ const countDownTimer = (buttonId) => {
 
 const startRecording = (buttonId) => {
   navigator.mediaDevices.getUserMedia({ audio: true })
-    .then(stream => {
+  .then(stream => {
 
-      input = audioContext.createMediaStreamSource(stream);
-      analyser = audioContext.createAnalyser();
-      scriptProcessor = audioContext.createScriptProcessor();
+    input = audioContext.createMediaStreamSource(stream);
+    analyser = audioContext.createAnalyser();
+    scriptProcessor = audioContext.createScriptProcessor();
 
-      analyser.smoothingTimeConstant = 0.3;
-      analyser.fftSize = 1024;
+    analyser.smoothingTimeConstant = 0.3;
+    analyser.fftSize = 1024;
 
-      // Connect the audio nodes
-      input.connect(analyser);
-      analyser.connect(scriptProcessor);
-      scriptProcessor.connect(audioContext.destination);
+    // Connect the audio nodes
+    input.connect(analyser);
+    analyser.connect(scriptProcessor);
+    scriptProcessor.connect(audioContext.destination);
 
-      // Add an event handler
-      scriptProcessor.onaudioprocess = processInput;
+    // Add an event handler
+    scriptProcessor.onaudioprocess = processInput;
 
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorder.start();
+    const mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.start();
 
-      const audioChunks = [];
-      mediaRecorder.addEventListener(`dataavailable`, event => {
-        audioChunks.push(event.data);
-      });
-
-      mediaRecorder.addEventListener(`stop`, () => {
-        const audioBlob = new Blob(audioChunks);
-        const audioUrl = URL.createObjectURL(audioBlob);
-        recordedSounds[buttonId] = new Audio(audioUrl);
-        recording = false;
-        canvasUi.style.visibility = `hidden`;
-        canvasUi.style.opacity = `0`;
-        console.log(recordedSounds);
-        console.log(buttonId);
-        console.log(recordedSounds[parseInt(buttonId)].play())
-      });
-
-      setTimeout(() => {
-        mediaRecorder.stop();
-        isRecording = false;
-        drawing = false;
-        console.log(`stopped`);
-        bars = [];
-        scriptProcessor.onaudioprocess = null;
-        renderBars(bars);
-      }, 1000);
+    const audioChunks = [];
+    mediaRecorder.addEventListener(`dataavailable`, event => {
+      audioChunks.push(event.data);
     });
+
+    mediaRecorder.addEventListener(`stop`, () => {
+      const audioBlob = new Blob(audioChunks);
+      const audioUrl = URL.createObjectURL(audioBlob);
+      recordedSounds[buttonId] = new Audio(audioUrl);
+      recording = false;
+      canvasUi.style.visibility = `hidden`;
+      canvasUi.style.opacity = `0`;
+      console.log(recordedSounds);
+      console.log(buttonId);
+      console.log(recordedSounds[parseInt(buttonId)].play())
+    });
+
+    setTimeout(() => {
+      mediaRecorder.stop();
+      isRecording = false;
+      drawing = false;
+      console.log(`stopped`);
+      bars = [];
+      scriptProcessor.onaudioprocess = null;
+      renderBars(bars);
+    }, 1000);
+  });
 }
 
 const playCurrentColumn = (step) => {
@@ -188,66 +188,108 @@ const startPlaying = () => {
     console.log(currentStep);
     if (currentStep < steps) {
       currentStep++;
-    } else {
+    } else {
       currentStep = 0;
     }
   }, 1000);
 }
 
-const init = () => {
+// Set up the scene, camera, and renderer as global variables.
+var scene, camera, renderer;
+
+init();
+animate();
+
+// Sets up the scene.
+function init() {
   startPlaying();
   // Create the scene and set the scene size.
+
+  scene = new THREE.Scene();
+  var WIDTH = window.innerWidth,
+      HEIGHT = window.innerHeight;
+
+  // Create a renderer and add it to the DOM.
+  renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer.setSize(WIDTH, HEIGHT);
+  document.querySelector(`.canvas__wrapper`).appendChild(renderer.domElement);
+  renderer.domElement.id = `context`
+
+  // Create a camera, zoom it out from the model a bit, and add it to the scene.
+  camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 20000);
+  camera.position.set(0,6,0);
+  scene.add(camera);
+
+  // Create a light, set its position, and add it to the scene.
+  var light = new THREE.PointLight(0xffffff);
+  light.position.set(-100,200,100);
+  scene.add(light);
+
+  // Add a white PointLight to the scene.
+  var loader = new THREE.JSONLoader();
+  loader.load( 'https://codepen.io/nickpettit/pen/nqyaK.js', function(geometry){
+    var material = new THREE.MeshLambertMaterial({color: 0x55B663});
+    mesh = new THREE.Mesh( geometry, material);
+    scene.add(mesh);
+  });
+
+  // Add OrbitControls so that we can pan around with the mouse.
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+}
+
+// Renders the scene and updates the render as needed.
+function animate() {
+  requestAnimationFrame( animate );
+  renderer.render( scene, camera );
+  controls.update();
 }
 
 const processInput = audioProcessingEvent => {  
-  // Create a new Uint8Array to store the analyser's frequencyBinCount 
-  const tempArray = new Uint8Array(analyser.frequencyBinCount);
+    // Create a new Uint8Array to store the analyser's frequencyBinCount 
+    const tempArray = new Uint8Array(analyser.frequencyBinCount);
 
-  // Get the byte frequency data from our array
-  analyser.getByteFrequencyData(tempArray);
+    // Get the byte frequency data from our array
+    analyser.getByteFrequencyData(tempArray);
     
-  // Calculate the average volume and store that value in our bars Array
-  bars.push(getAverageVolume(tempArray));
+    // Calculate the average volume and store that value in our bars Array
+    bars.push(getAverageVolume(tempArray));
 
-  // Render the bars
-  renderBars(bars);
+    // Render the bars
+    renderBars(bars);
 }
 
-init();
-
-
 const getAverageVolume = array => {    
-  const length = array.length;
-  let values = 0;
-  let i = 0;
+    const length = array.length;
+    let values = 0;
+    let i = 0;
 
-  // Loop over the values of the array, and count them
-  for (; i < length; i++) {
-    values += array[i];
-  }
+    // Loop over the values of the array, and count them
+    for (; i < length; i++) {
+        values += array[i];
+    }
 
-  // Return the avarag
-  return values / length;
+    // Return the avarag
+    return values / length;
 }
 
 const renderBars = () => {  
-  if (!drawing) {
-    drawing = true;
+    if (!drawing) {
+        drawing = true;
 
-    window.requestAnimationFrame(() => {
-      canvasContext.clearRect(0, 0, width, height);
+        window.requestAnimationFrame(() => {
+            canvasContext.clearRect(0, 0, width, height);
 
-      bars.forEach((bar, index) => {
-        canvasContext.fillStyle = barColor;
+            bars.forEach((bar, index) => {
+                canvasContext.fillStyle = barColor;
                 
-        // Top part of the bar
-        canvasContext.fillRect((index * (barWidth + barGutter)), (halfHeight - (halfHeight * (bar / 100))), barWidth, (halfHeight * (bar / 100)));
+                // Top part of the bar
+                canvasContext.fillRect((index * (barWidth + barGutter)), (halfHeight - (halfHeight * (bar / 100))), barWidth, (halfHeight * (bar / 100)));
 
-        // Bottom part of the bars
-        canvasContext.fillRect((index * (barWidth + barGutter)), halfHeight, barWidth, (halfHeight * (bar / 100)));
-      });
+                // Bottom part of the bars
+                canvasContext.fillRect((index * (barWidth + barGutter)), halfHeight, barWidth, (halfHeight * (bar / 100)));
+            });
 
-      drawing = false;
-    });
-  }
+            drawing = false;
+        });
+    }
 }
