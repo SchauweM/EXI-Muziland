@@ -21,7 +21,7 @@ let placedBlocks = [
   [0,0,0,0,0,0,0,0],
 ]
 const steps = 8;
-const rows = 4;
+// const rows = 4;
 let currentStep = 0;
 let canvasUi = document.querySelector(`.canvas__ui`);
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
@@ -46,7 +46,7 @@ let scriptProcessor = null;
 // Canvas related variables
 const barWidth = 2;
 const barGutter = 2;
-const barColor = "#000";
+const barColor = `#000`;
 
 let canvas = null;
 let canvasContext = null;
@@ -98,9 +98,9 @@ const changeBlock = (data) => {
 const startRecordHandler = (key) => {
   recording = true;
   buttonId = parseInt(key.replace('button-', ''));
-  canvasUi.innerHTML = "<div class='countdown__timer'><h2>Recording audio:</h2><p class='ui__countdown'></p></div>";
-  canvasUi.style.visibility = "visible";
-  canvasUi.style.opacity = "1";
+  canvasUi.innerHTML = `<div class='countdown__timer'><h2>Recording audio:</h2><p class='ui__countdown'></p></div>`;
+  canvasUi.style.visibility = `visible`;
+  canvasUi.style.opacity = `1`;
   refreshIntervalId = setInterval(() => {
     countDownTimer(buttonId)
   }, 1000);
@@ -141,17 +141,17 @@ const startRecording = (buttonId) => {
     mediaRecorder.start();
 
     const audioChunks = [];
-    mediaRecorder.addEventListener("dataavailable", event => {
+    mediaRecorder.addEventListener(`dataavailable`, event => {
       audioChunks.push(event.data);
     });
 
-    mediaRecorder.addEventListener("stop", () => {
+    mediaRecorder.addEventListener(`stop`, () => {
       const audioBlob = new Blob(audioChunks);
       const audioUrl = URL.createObjectURL(audioBlob);
       recordedSounds[buttonId] = new Audio(audioUrl);
       recording = false;
-      canvasUi.style.visibility = "hidden";
-      canvasUi.style.opacity = "0";
+      canvasUi.style.visibility = `hidden`;
+      canvasUi.style.opacity = `0`;
       console.log(recordedSounds);
       console.log(buttonId);
       console.log(recordedSounds[parseInt(buttonId)].play())
@@ -161,7 +161,7 @@ const startRecording = (buttonId) => {
       mediaRecorder.stop();
       isRecording = false;
       drawing = false;
-      console.log("stopped");
+      console.log(`stopped`);
       bars = [];
       scriptProcessor.onaudioprocess = null;
       renderBars(bars);
@@ -213,7 +213,7 @@ function init() {
   renderer = new THREE.WebGLRenderer({antialias:true});
   renderer.setSize(WIDTH, HEIGHT);
   document.querySelector(`.canvas__wrapper`).appendChild(renderer.domElement);
-  renderer.domElement.id = "context"
+  renderer.domElement.id = `context`
 
   // Create a camera, zoom it out from the model a bit, and add it to the scene.
   camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 20000);
