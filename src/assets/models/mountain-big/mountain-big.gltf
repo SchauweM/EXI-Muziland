@@ -1,0 +1,268 @@
+{
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5123,
+            "count" : 537,
+            "max" : [
+                536
+            ],
+            "min" : [
+                0
+            ],
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 537,
+            "max" : [
+                72.24251556396484,
+                8.283525466918945,
+                6.20048189163208
+            ],
+            "min" : [
+                -6.7246198654174805,
+                -70.68350219726562,
+                -106.47581481933594
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 537,
+            "max" : [
+                0.9884617328643799,
+                0.985451877117157,
+                -0.0874331146478653
+            ],
+            "min" : [
+                -0.985487699508667,
+                -0.9908484220504761,
+                -0.9998824000358582
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5126,
+            "count" : 537,
+            "max" : [
+                0.9964532256126404,
+                0.9994280934333801,
+                0.6646372079849243,
+                -1.0
+            ],
+            "min" : [
+                -0.9919916391372681,
+                -0.9903222918510437,
+                -0.6012043356895447,
+                -1.0
+            ],
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5126,
+            "count" : 537,
+            "max" : [
+                0.9040221571922302,
+                0.8119699954986572
+            ],
+            "min" : [
+                0.09491586685180664,
+                0.0
+            ],
+            "type" : "VEC2"
+        }
+    ],
+    "asset" : {
+        "generator" : "Khronos Blender glTF 2.0 exporter",
+        "version" : "2.0"
+    },
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 1074,
+            "byteOffset" : 0,
+            "target" : 34963
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 6444,
+            "byteOffset" : 1076,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 6444,
+            "byteOffset" : 7520,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 8592,
+            "byteOffset" : 13964,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 4296,
+            "byteOffset" : 22556,
+            "target" : 34962
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 26852,
+            "uri" : "mountain-big.bin"
+        }
+    ],
+    "materials" : [
+        {
+            "name" : "default",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.6400000190734865,
+                    0.6400000190734865,
+                    0.6400000190734865,
+                    1.0
+                ],
+                "metallicFactor" : 0.0
+            }
+        },
+        {
+            "name" : "Material.001",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.06582616665700325,
+                    0.15569427245399758,
+                    0.004145213278311688,
+                    1.0
+                ],
+                "metallicFactor" : 0.0
+            }
+        },
+        {
+            "name" : "Material.002",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.2904242320421968,
+                    0.08120623947987315,
+                    0.028155059041903296,
+                    1.0
+                ],
+                "metallicFactor" : 0.0
+            }
+        },
+        {
+            "name" : "Material.006",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.24559722312684684,
+                    0.14234744522493248,
+                    0.10622340599035329,
+                    1.0
+                ],
+                "metallicFactor" : 0.0
+            }
+        },
+        {
+            "name" : "Material.007",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.08497717507149538,
+                    0.16877326024730888,
+                    0.01422081163854616,
+                    1.0
+                ],
+                "metallicFactor" : 0.0
+            }
+        },
+        {
+            "name" : "Material.008",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.4568999835386869,
+                    0.3010097071678892,
+                    0.15025664791847237,
+                    1.0
+                ],
+                "metallicFactor" : 0.0
+            }
+        },
+        {
+            "name" : "Material.009",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.08954595460811188,
+                    0.2001266509313382,
+                    0.005209671783591385,
+                    1.0
+                ],
+                "metallicFactor" : 0.0
+            }
+        },
+        {
+            "name" : "Material.012",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.22031150192486493,
+                    0.640000066757203,
+                    0.6126782508593536,
+                    1.0
+                ],
+                "metallicFactor" : 0.0
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "clloud.018",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "NORMAL" : 2,
+                        "POSITION" : 1,
+                        "TANGENT" : 3,
+                        "TEXCOORD_0" : 4
+                    },
+                    "indices" : 0,
+                    "material" : 5
+                }
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "clloud.017",
+            "rotation" : [
+                0.7071068286895752,
+                0.0,
+                -0.0,
+                0.7071067094802856
+            ],
+            "scale" : [
+                0.047383010387420654,
+                0.047383010387420654,
+                0.047383010387420654
+            ],
+            "translation" : [
+                -0.47423887252807617,
+                1.9714317321777344,
+                -0.8587204217910767
+            ]
+        }
+    ],
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ]
+}

@@ -3,16 +3,29 @@
 // All of the Node.js APIs are available in this process.
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-const port = new SerialPort('/dev/cu.usbmodem14101', {
+const port = new SerialPort('/dev/cu.usbmodem14201', {
   baudRate: 1000000
+});
+const portBlokken = new SerialPort('/dev/cu.usbmodem14101', {
+  baudRate: 9600
 });
 let recording = false;
 let recordingCountdownSeconds = 4;
 let secondsLeft = recordingCountdownSeconds;
 let refreshIntervalId = null;
-let recordedSounds = [];
+let recordedSounds = [null, null, null, null];
+let placedBlocks = [
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
+]
+const steps = 8;
+// const rows = 4;
+let currentStep = 0;
 let canvasUi = document.querySelector(`.canvas__ui`);
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+const parserBlokken = portBlokken.pipe(new Readline( { delimiter: '\r\n' }));
 
 // setting vars bars
 // We'll store the value of te bars we want to draw in here
@@ -33,7 +46,7 @@ let scriptProcessor = null;
 // Canvas related variables
 const barWidth = 2;
 const barGutter = 2;
-const barColor = "#000";
+const barColor = `#000`;
 
 let canvas = null;
 let canvasContext = null;
@@ -58,7 +71,7 @@ canvasContext.canvas.height = height;
 // be closed automatically when the JavaScript object is garbage collected.
 
 
-parser.on('data', function (data) {
+parser.on('data', (data) => {
   let dataconvert = JSON.parse(data.toString());
   if (recording === false) {
     startRecordHandler(Object.keys(dataconvert)[0]);
@@ -67,12 +80,27 @@ parser.on('data', function (data) {
   }
 });
 
+parserBlokken.on('data', (data) => {
+  let dataconvert = JSON.parse(data.toString());
+  changeBlock(dataconvert);
+})
+
+const changeBlock = (data) => {
+  for (let i = 0; i < Object.keys(data).length; i++) {
+    const keys = Object.keys(data)[i].split(':');
+    const value = data[Object.keys(data)[i]];
+    placedBlocks[keys[0]][keys[1]] = value;
+    console.log(`${keys[0]} : ${keys[1]} - ${value}`);
+  }
+  // console.log(data);
+}
+
 const startRecordHandler = (key) => {
   recording = true;
   buttonId = parseInt(key.replace('button-', ''));
-  canvasUi.innerHTML = "<div class='countdown__timer'><h2>Recording audio:</h2><p class='ui__countdown'></p></div>";
-  canvasUi.style.visibility = "visible";
-  canvasUi.style.opacity = "1";
+  canvasUi.innerHTML = `<div class='countdown__timer'><h2>Recording audio:</h2><p class='ui__countdown'></p></div>`;
+  canvasUi.style.visibility = `visible`;
+  canvasUi.style.opacity = `1`;
   refreshIntervalId = setInterval(() => {
     countDownTimer(buttonId)
   }, 1000);
@@ -113,29 +141,57 @@ const startRecording = (buttonId) => {
     mediaRecorder.start();
 
     const audioChunks = [];
-    mediaRecorder.addEventListener("dataavailable", event => {
+    mediaRecorder.addEventListener(`dataavailable`, event => {
       audioChunks.push(event.data);
     });
 
-    mediaRecorder.addEventListener("stop", () => {
+    mediaRecorder.addEventListener(`stop`, () => {
       const audioBlob = new Blob(audioChunks);
       const audioUrl = URL.createObjectURL(audioBlob);
       recordedSounds[buttonId] = new Audio(audioUrl);
       recording = false;
-      canvasUi.style.visibility = "hidden";
-      canvasUi.style.opacity = "0";
+      canvasUi.style.visibility = `hidden`;
+      canvasUi.style.opacity = `0`;
+      console.log(recordedSounds);
+      console.log(buttonId);
+      console.log(recordedSounds[parseInt(buttonId)].play())
     });
 
     setTimeout(() => {
       mediaRecorder.stop();
       isRecording = false;
       drawing = false;
-      console.log("stopped");
+      console.log(`stopped`);
       bars = [];
       scriptProcessor.onaudioprocess = null;
       renderBars(bars);
     }, 1000);
   });
+}
+
+const playCurrentColumn = (step) => {
+  for (let i = 0; i < 4; i++) {
+    if (placedBlocks[i][step] === 1) {
+      if (recordedSounds[i] !== null) {
+        console.log(`playing ${step} + ${i}`);
+        recordedSounds[i].play();
+      }
+    } else {
+      console.log(`no sound: ${step} + ${i}`);
+    }
+  }
+}
+
+const startPlaying = () => {
+  playSounds = setInterval(() => {
+    playCurrentColumn(currentStep);
+    console.log(currentStep);
+    if (currentStep < steps) {
+      currentStep++;
+    } else {
+      currentStep = 0;
+    }
+  }, 1000);
 }
 
 // Set up the scene, camera, and renderer as global variables.
@@ -146,6 +202,7 @@ animate();
 
 // Sets up the scene.
 function init() {
+  startPlaying();
   // Create the scene and set the scene size.
 
   scene = new THREE.Scene();
@@ -156,7 +213,7 @@ function init() {
   renderer = new THREE.WebGLRenderer({antialias:true});
   renderer.setSize(WIDTH, HEIGHT);
   document.querySelector(`.canvas__wrapper`).appendChild(renderer.domElement);
-  renderer.domElement.id = "context"
+  renderer.domElement.id = `context`
 
   // Create a camera, zoom it out from the model a bit, and add it to the scene.
   camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 20000);
