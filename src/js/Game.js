@@ -1,6 +1,3 @@
-// This file is required by the index.html file and will
-// be executed in the renderer process for that window.
-// All of the Node.js APIs are available in this process.
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
 const port = new SerialPort('/dev/cu.usbmodem14201', {
@@ -21,7 +18,8 @@ let placedBlocks = [
   [0,0,0,0,0,0,0,0],
 ]
 const steps = 8;
-// const rows = 4;
+let playSounds = null;
+const rows = 4;
 let currentStep = 0;
 let canvasUi = document.querySelector(`.canvas__ui`);
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
@@ -46,7 +44,7 @@ let scriptProcessor = null;
 // Canvas related variables
 const barWidth = 2;
 const barGutter = 2;
-const barColor = `#000`;
+const barColor = '#000';
 
 let canvas = null;
 let canvasContext = null;
@@ -92,15 +90,14 @@ const changeBlock = (data) => {
     placedBlocks[keys[0]][keys[1]] = value;
     console.log(`${keys[0]} : ${keys[1]} - ${value}`);
   }
-  // console.log(data);
 }
 
 const startRecordHandler = (key) => {
   recording = true;
-  buttonId = parseInt(key.replace('button-', ''));
-  canvasUi.innerHTML = `<div class='countdown__timer'><h2>Recording audio:</h2><p class='ui__countdown'></p></div>`;
-  canvasUi.style.visibility = `visible`;
-  canvasUi.style.opacity = `1`;
+  let buttonId = parseInt(key.replace('button-', ''));
+  canvasUi.innerHTML = '<div class="countdown__timer"><h2>Recording audio:</h2><p class="ui__countdown"></p></div>';
+  canvasUi.style.visibility = 'visible';
+  canvasUi.style.opacity = '1';
   refreshIntervalId = setInterval(() => {
     countDownTimer(buttonId)
   }, 1000);
@@ -141,17 +138,17 @@ const startRecording = (buttonId) => {
       mediaRecorder.start();
 
       const audioChunks = [];
-      mediaRecorder.addEventListener(`dataavailable`, event => {
+      mediaRecorder.addEventListener('dataavailable', event => {
         audioChunks.push(event.data);
       });
 
-      mediaRecorder.addEventListener(`stop`, () => {
+      mediaRecorder.addEventListener('stop', () => {
         const audioBlob = new Blob(audioChunks);
         const audioUrl = URL.createObjectURL(audioBlob);
         recordedSounds[buttonId] = new Audio(audioUrl);
         recording = false;
-        canvasUi.style.visibility = `hidden`;
-        canvasUi.style.opacity = `0`;
+        canvasUi.style.visibility = 'hidden';
+        canvasUi.style.opacity = '0';
         console.log(recordedSounds);
         console.log(buttonId);
         console.log(recordedSounds[parseInt(buttonId)].play())
@@ -159,9 +156,8 @@ const startRecording = (buttonId) => {
 
       setTimeout(() => {
         mediaRecorder.stop();
-        isRecording = false;
         drawing = false;
-        console.log(`stopped`);
+        console.log('stopped');
         bars = [];
         scriptProcessor.onaudioprocess = null;
         renderBars(bars);
@@ -170,7 +166,7 @@ const startRecording = (buttonId) => {
 }
 
 const playCurrentColumn = (step) => {
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < rows; i++) {
     if (placedBlocks[i][step] === 1) {
       if (recordedSounds[i] !== null) {
         console.log(`playing ${step} + ${i}`);
@@ -194,18 +190,18 @@ const startPlaying = () => {
   }, 1000);
 }
 
-const init = () => {
-  startPlaying();
-  // Create the scene and set the scene size.
+const stopPlaying = () => {
+  clearInterval(playSounds);
+  playSounds = null;
 }
 
-const processInput = audioProcessingEvent => {  
+const processInput = () => {  
   // Create a new Uint8Array to store the analyser's frequencyBinCount 
   const tempArray = new Uint8Array(analyser.frequencyBinCount);
 
   // Get the byte frequency data from our array
   analyser.getByteFrequencyData(tempArray);
-    
+  
   // Calculate the average volume and store that value in our bars Array
   bars.push(getAverageVolume(tempArray));
 
@@ -236,7 +232,7 @@ const renderBars = () => {
 
       bars.forEach((bar, index) => {
         canvasContext.fillStyle = barColor;
-                
+        
         // Top part of the bar
         canvasContext.fillRect((index * (barWidth + barGutter)), (halfHeight - (halfHeight * (bar / 100))), barWidth, (halfHeight * (bar / 100)));
 
@@ -249,4 +245,4 @@ const renderBars = () => {
   }
 }
 
-init();
+startPlaying();
