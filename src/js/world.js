@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 let scene,
   WIDTH,
   HEIGHT,
@@ -92,6 +93,7 @@ const createObjects = () => {
   loader.load('./assets/models/three-big/three-big.gltf', function ( threeBig ) {
     console.log(`loaded: `, threeBig);  
     scene.add( threeBig.scene );    
+    threeBig.scene.scale.x = threeBig.scene.scale.y = threeBig.scene.scale.z = 1.25; 
   }, undefined, function ( error ) {
     console.error(`Not loaded:`, error );
   });

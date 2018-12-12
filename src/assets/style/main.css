@@ -42,6 +42,8 @@ canvas {
 
 .waveform {
   width: 100rem;
+  opacity: 0;
+  visibility: hidden;
   position: absolute;
   background-color: #CDCDCD;
 }
