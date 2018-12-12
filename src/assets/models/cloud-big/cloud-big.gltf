@@ -1,0 +1,196 @@
+{
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5123,
+            "count" : 882,
+            "max" : [
+                881
+            ],
+            "min" : [
+                0
+            ],
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 882,
+            "max" : [
+                -72.97500610351562,
+                123.18709564208984,
+                -63.8957405090332
+            ],
+            "min" : [
+                -105.70249938964844,
+                101.2964096069336,
+                -86.750244140625
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 882,
+            "max" : [
+                0.9968011379241943,
+                0.9912557005882263,
+                0.9930321574211121
+            ],
+            "min" : [
+                -0.9973962903022766,
+                -0.9741938710212708,
+                -0.9972296953201294
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5126,
+            "count" : 882,
+            "max" : [
+                0.9934594035148621,
+                0.9990705251693726,
+                0.7253577709197998,
+                -1.0
+            ],
+            "min" : [
+                -0.9996756911277771,
+                -0.9985727071762085,
+                -0.7563978433609009,
+                -1.0
+            ],
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5126,
+            "count" : 882,
+            "max" : [
+                1.0,
+                0.9544315338134766
+            ],
+            "min" : [
+                0.09467931091785431,
+                0.033446550369262695
+            ],
+            "type" : "VEC2"
+        }
+    ],
+    "asset" : {
+        "generator" : "Khronos Blender glTF 2.0 exporter",
+        "version" : "2.0"
+    },
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 1764,
+            "byteOffset" : 0,
+            "target" : 34963
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 10584,
+            "byteOffset" : 1764,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 10584,
+            "byteOffset" : 12348,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 14112,
+            "byteOffset" : 22932,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 7056,
+            "byteOffset" : 37044,
+            "target" : 34962
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 44100,
+            "uri" : "cloud-big.bin"
+        }
+    ],
+    "materials" : [
+        {
+            "name" : "default",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.6400000190734865,
+                    0.6400000190734865,
+                    0.6400000190734865,
+                    1.0
+                ],
+                "metallicFactor" : 0.0
+            }
+        },
+        {
+            "name" : "Material.004",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.11615894013880101,
+                    0.640000066757203,
+                    0.08936445250160174,
+                    1.0
+                ],
+                "metallicFactor" : 0.0
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "cloud-big-mesh",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "NORMAL" : 2,
+                        "POSITION" : 1,
+                        "TANGENT" : 3,
+                        "TEXCOORD_0" : 4
+                    },
+                    "indices" : 0,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "cloud-big",
+            "rotation" : [
+                0.7071068286895752,
+                0.0,
+                -0.0,
+                0.7071067094802856
+            ],
+            "scale" : [
+                0.047383010387420654,
+                0.047383010387420654,
+                0.047383010387420654
+            ],
+            "translation" : [
+                -0.47423887252807617,
+                1.9714317321777344,
+                -4.929917335510254
+            ]
+        }
+    ],
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "World",
+            "nodes" : [
+                0
+            ]
+        }
+    ]
+}

@@ -605,7 +605,7 @@
     ],
     "meshes" : [
         {
-            "name" : "clloud",
+            "name" : "island",
             "primitives" : [
                 {
                     "attributes" : {
