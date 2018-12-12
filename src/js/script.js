@@ -33,7 +33,6 @@ const Tree = require('./classes/Tree');
     [0,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0],
   ]
-  let trees = [];
   const steps = 8;
   const rows = 4;
   let currentStep = 0;
@@ -61,7 +60,7 @@ const Tree = require('./classes/Tree');
   // Canvas related variables
   const barWidth = 2;
   const barGutter = 2;
-  const barColor = `#000`;
+  const barColor = `#fff`;
 
   let canvas = null;
   let canvasContext = null;
@@ -154,11 +153,14 @@ const Tree = require('./classes/Tree');
   const startRecordHandler = (key) => {
     recording = true;
     buttonId = parseInt(key.replace('button-', ''));
-    canvasUi.innerHTML = `<div class='countdown__timer'><h2>Recording audio:</h2><p class='ui__countdown'></p></div>`;
-    waveform.style.visibility = `visible`;
+    canvasUi.innerHTML = `<div class='countdown__timer'><h2>Maak een geluid in...</h2><p class='ui__countdown'>4</p></div>`;
+
+    waveform.style.visibility = `hidden`;
     waveform.style.opacity = `1`;
+
     canvasUi.style.visibility = `visible`;
     canvasUi.style.opacity = `1`;
+
     refreshIntervalId = setInterval(() => {
       countDownTimer(buttonId)
     }, 1000);
@@ -169,6 +171,7 @@ const Tree = require('./classes/Tree');
     console.log(secondsLeft);
     document.querySelector(`.ui__countdown`).innerHTML = secondsLeft;
     if (secondsLeft === 0) {
+      document.querySelector(`.ui__countdown`).innerHTML = `Nu!`;
       clearInterval(refreshIntervalId);
       refreshIntervalId = null;
       secondsLeft = recordingCountdownSeconds;
@@ -315,6 +318,7 @@ const Tree = require('./classes/Tree');
     createScene();
     createLights();
     createWorld();
+    createBlockUI();
     loop();
     console.log(`hello world`);
   };
@@ -348,7 +352,6 @@ const Tree = require('./classes/Tree');
     renderer.physicallyCorrectLights = true;
     renderer.gammaOutput = true;
     renderer.gammaFactor = 2.2;
-    renderer.setClearColor( 0xcccccc );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize(WIDTH, HEIGHT);
 
@@ -372,7 +375,7 @@ const Tree = require('./classes/Tree');
     // It acts like the sun, that means that all the rays produced are parallel.
     shadowLight = new THREE.DirectionalLight(0xffffff, 1.7);
 
-    ambientLight = new THREE.AmbientLight(0xffffff, .11)
+    ambientLight = new THREE.AmbientLight(0xdc8874, .5)
     // to activate the lights, just add them to the scene
     scene.add(shadowLight);
     scene.add(ambientLight);
