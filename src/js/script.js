@@ -16,10 +16,10 @@ const Tree = require('./classes/Tree');
 
   const SerialPort = require('serialport');
   const Readline = require('@serialport/parser-readline');
-  const port = new SerialPort('/dev/cu.usbmodem14201', {
+  const port = new SerialPort('/dev/cu.usbmodem143220', {
     baudRate: 9600
   });
-  const portBlokken = new SerialPort('/dev/cu.usbmodem14101', {
+  const portBlokken = new SerialPort('/dev/cu.usbmodem143230', {
     baudRate: 9600
   });
   let recording = false;
@@ -106,16 +106,49 @@ const Tree = require('./classes/Tree');
       const keys = Object.keys(data)[i].split(':');
       const value = data[Object.keys(data)[i]];
       placedBlocks[keys[0]][keys[1]] = value;
-      console.log(`${keys[0]} : ${keys[1]} - ${value}`);
-      createTree();
+      // console.log(`ROW ${keys[0]}: BLOCK ${keys[1]} - ON/OFF: ${value}`);
+      let type;
+      if (keys[0] == 0) {
+        console.log(`Mountains`);
+        type = `mountain`;
+        if (value === 1) {
+          console.log(`Create Mountain nr:`, keys[1]);
+          createObjects(type, keys[1])
+        } else {
+          console.log(`Remove Mountain nr:`, keys[1]);
+        }
+      } else if (keys[0] == 1) {
+        console.log(`Threes`)
+        type = `tree`;
+        if (value === 1) {
+          console.log(`Create Three nr:`, keys[1]);
+          createObjects(type, keys[1])
+        } else {
+          console.log(`Remove Three nr:`, keys[1]);
+        }
+      } else if (keys[0] == 2) {
+        console.log(`Flowers`)
+        type = `flower`
+        if (value === 1) {
+          console.log(`Create Flower`);
+          createObjects(type, keys[1])
+        } else {
+          console.log(`Remove Flower`);
+        }
+      } else if (keys[0] == 3) {
+        console.log(`Clouds`)
+        type = `flower`
+        if (value === 1) {
+          console.log(`Create Cloud`);
+          createObjects(type, keys[1])
+        } else {
+          console.log(`Remove Cloud`);
+        }
+      }
+      //createTree();
     }
+    console.log(`Placed Blocks: `, placedBlocks);
     // console.log(data);
-  }
-
-  const createTree = () => {
-    let tree = new Tree();
-    console.log(tree);
-    scene.add(tree);
   }
 
   const startRecordHandler = (key) => {
@@ -349,26 +382,28 @@ const Tree = require('./classes/Tree');
     //Inits GLTFLoader
     let loader = new THREE.GLTFLoader();
 
-    loader.load('./assets/models/island/island.gltf', function ( island ) {
-      console.log(`loaded: `, island);  
-      scene.add( island.scene );    
+    loader.load('./assets/models/island/island.gltf', function ( gltf ) {
+      console.log(`loaded: `, gltf.scene.children[0]); 
+      scene.add(gltf.scene.children[0]);    
     }, undefined, function ( error ) {
       console.error(`Not loaded:`, error );
     });    
-
-    createTree();
   };
 
-  /*const createTree = () => {
+  const createObjects = (type, block) => {
+    console.log(type, block);
+
     let loader = new THREE.GLTFLoader();
-    loader.load('./assets/models/three-big/three-big.gltf', function ( threeBig ) {
-      console.log(`loaded: `, threeBig); 
-      // threeBig.scene.scale.x = threeBig.scene.scale.y = threeBig.scene.scale.z = 1.25; 
-      scene.add(threeBig);
-    }, undefined, function ( error ) {
-      console.error(`Not loaded:`, error );
-    });
-  }*/
+    
+    loader.load(`./assets/models/${type}/${type}-${block}.gltf`, function ( gltf ) {
+      let item = gltf.scene.children[0];
+      item.position.x = Math.floor(Math.random() * (-5 - 8)) + 8;
+      item.position.z = Math.floor(Math.random() * (-5 - 8)) + 8;
+      item.name = `${type}-${block}`
+      console.log(item.name);
+      scene.add(item);
+    })
+  }
 
   const loop = () => {
     requestAnimationFrame(loop);
