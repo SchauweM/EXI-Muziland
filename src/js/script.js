@@ -17,10 +17,11 @@ const bpm = 667; //90BPM
 
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-const port = new SerialPort('/dev/cu.usbmodem143220', {
+const port = new SerialPort('/dev/cu.usbmodem14201', {
   baudRate: 9600
 });
-const portBlokken = new SerialPort('/dev/cu.usbmodem143230', {
+let playing = true;
+const portBlokken = new SerialPort('/dev/cu.usbmodem14101', {
   baudRate: 9600
 });
 let recording = false;
@@ -39,13 +40,8 @@ const steps = 8;
 const rows = 4;
 let currentStep = 0;
 const canvasUi = document.querySelector(`.canvas__game__ui`);
-const waveform = document.querySelector(`.waveform`);
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 const parserBlokken = portBlokken.pipe(new Readline( { delimiter: '\r\n' }));
-
-// setting vars bars
-// We'll store the value of te bars we want to draw in here
-let bars = []
 
 // An instance of AudioContext
 const audioContext = new AudioContext();
@@ -59,41 +55,27 @@ let analyser = null;
 // This will become our ScriptProcessorNode
 let scriptProcessor = null;
 
-// Canvas related variables
-const barWidth = 2;
-const barGutter = 2;
-const barColor = `#fff`;
-
-let canvas = null;
-let canvasContext = null;
-let width = 0;
-let height = 0;
-let halfHeight = 0;
-let drawing = false;
-
-canvas = document.querySelector('canvas');
-canvasContext = canvas.getContext('2d');
-
-// Set the dimensions
-width = canvas.offsetWidth;
-height = canvas.offsetHeight;
-halfHeight = height / 2;
-
-// Set the size of the canvas context to the size of the canvas element
-canvasContext.canvas.width = width;
-canvasContext.canvas.height = height;
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 
 
 parser.on('data', (data) => {
   let dataconvert = JSON.parse(data.toString());
-  console.log(dataconvert);
-  if (recording === false) {
-    startRecordHandler(Object.keys(dataconvert)[0]);
+  if (Object.keys(dataconvert)[0] === 'button-4') {
+    playing = !playing;
+    if (playing) {
+      console.log('started');
+      startPlaying();
+    } else {
+      console.log('stopped');
+      stopPlaying();
+    }
   } else {
-    console.log(`already recording something`);
+    if (recording === false) {
+      startRecordHandler(Object.keys(dataconvert)[0]);
+    } else {
+      console.log(`already recording something`);
+    }
   }
 });
 
@@ -107,7 +89,14 @@ const changeBlock = (data) => {
     const keys = Object.keys(data)[i].split(':');
     const value = data[Object.keys(data)[i]];
     placedBlocks[keys[0]][keys[1]] = value;
-    // console.log(`ROW ${keys[0]}: BLOCK ${keys[1]} - ON/OFF: ${value}`);
+    let rowsss = document.querySelectorAll(`.table__row`);
+    let cellsInRow = rowsss[keys[0]].querySelectorAll('.table__cell');
+    if (value === 0) {
+      cellsInRow[keys[1]].classList.remove(`blockinside`);
+    } else if (value === 1) {
+      cellsInRow[keys[1]].classList.add(`blockinside`);
+    }
+    console.log(`ROW ${keys[0]}: BLOCK ${keys[1]} - ON/OFF: ${value}`);
     let type;
     if (keys[0] == 0) {
       console.log(`Mountains`);
@@ -120,13 +109,13 @@ const changeBlock = (data) => {
         deleteObject(type, keys[1])
       }
     } else if (keys[0] == 1) {
-      console.log(`Threes`)
+      console.log(`Trees`)
       type = `tree`;
       if (value === 1) {
-        console.log(`Create Three nr:`, keys[1]);
+        console.log(`Create Tree nr:`, keys[1]);
         createObjects(type, keys[1])
       } else {
-        console.log(`Remove Three nr:`, keys[1]);
+        console.log(`Remove Tree nr:`, keys[1]);
         deleteObject(type, keys[1])
       }
     } else if (keys[0] == 2) {
@@ -161,8 +150,8 @@ const startRecordHandler = (key) => {
   let buttonId = parseInt(key.replace('button-', ''));
   canvasUi.innerHTML = `<div class='ui__countdown__container'><div class='countdown__timer'><h2>Maak een geluid in...</h2><p class='ui__countdown'>4</p></div></div>`;
 
-  waveform.style.visibility = `hidden`;
-  waveform.style.opacity = `1`;
+  // waveform.style.visibility = `visible`;
+  // waveform.style.opacity = `1`;
 
   canvasUi.style.visibility = `visible`;
   canvasUi.style.opacity = `1`;
@@ -202,7 +191,7 @@ const startRecording = (buttonId) => {
       scriptProcessor.connect(audioContext.destination);
 
       // Add an event handler
-      scriptProcessor.onaudioprocess = processInput;
+      // scriptProcessor.onaudioprocess = processInput;
 
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorder.start();
@@ -219,8 +208,8 @@ const startRecording = (buttonId) => {
         recording = false;
         canvasUi.style.visibility = `visible`;
         canvasUi.style.opacity = `0`;
-        waveform.style.visibility = `hidden`;
-        waveform.style.opacity = `0`;
+        // waveform.style.visibility = `hidden`;
+        // waveform.style.opacity = `0`;
         console.log(recordedSounds);
         console.log(buttonId);
         console.log(recordedSounds[parseInt(buttonId)].play())
@@ -228,11 +217,10 @@ const startRecording = (buttonId) => {
 
       setTimeout(() => {
         mediaRecorder.stop();
-        drawing = false;
         console.log(`stopped`);
-        bars = [];
+        // bars = [];
         scriptProcessor.onaudioprocess = null;
-        renderBars(bars);
+        // renderBars(bars);
       }, 1000);
     });
 }
@@ -240,7 +228,16 @@ const startRecording = (buttonId) => {
 const playCurrentColumn = (step) => {
   //console.log(scene.getObjectByName('mountain- '));
   for (let i = 0; i < rows; i++) {
+    let rowsss = document.querySelectorAll(`.table__row`);
+    let cellsInRow = rowsss[i].querySelectorAll('.table__cell');
+    for (let j = 0; j < steps; j++) {
+      cellsInRow[j].classList.remove('active');
+    }
+    cellsInRow[step].classList.add('active');
     if (placedBlocks[i][step] === 1) {
+      let rowsss = document.querySelectorAll(`.table__row`);
+      let cellsInRow = rowsss[i].querySelectorAll('.table__cell');
+      cellsInRow[step].classList.add('active')
       if (recordedSounds[i] !== null) {
         console.log(`PLAYING WITH SOUND${step} + ${i}`);
         recordedSounds[i].play();
@@ -257,67 +254,21 @@ const startPlaying = () => {
   playSounds = setInterval(() => {
     playCurrentColumn(currentStep);
     console.log(currentStep);
-    if (currentStep < steps) {
+    if (currentStep < steps-1) {
       currentStep++;
     } else {
       currentStep = 0;
     }
+<<<<<<< Updated upstream
   }, bpm); //90BPM
+=======
+  }, 500);
+>>>>>>> Stashed changes
 }
 
 const stopPlaying = () => {
   clearInterval(playSounds);
   playSounds = null;
-}
-
-const processInput = () => {  
-  // Create a new Uint8Array to store the analyser's frequencyBinCount 
-  const tempArray = new Uint8Array(analyser.frequencyBinCount);
-
-  // Get the byte frequency data from our array
-  analyser.getByteFrequencyData(tempArray);
-    
-  // Calculate the average volume and store that value in our bars Array
-  bars.push(getAverageVolume(tempArray));
-
-  // Render the bars
-  renderBars(bars);
-}
-
-const getAverageVolume = array => {    
-  const length = array.length;
-  let values = 0;
-  let i = 0;
-
-  // Loop over the values of the array, and count them
-  for (; i < length; i++) {
-    values += array[i];
-  }
-
-  // Return the avarag
-  return values / length;
-}
-
-const renderBars = () => {  
-  if (!drawing) {
-    drawing = true;
-
-    window.requestAnimationFrame(() => {
-      canvasContext.clearRect(0, 0, width, height);
-
-      bars.forEach((bar, index) => {
-        canvasContext.fillStyle = barColor;
-                
-        // Top part of the bar
-        canvasContext.fillRect((index * (barWidth + barGutter)), (halfHeight - (halfHeight * (bar / 100))), barWidth, (halfHeight * (bar / 100)));
-
-        // Bottom part of the bars
-        canvasContext.fillRect((index * (barWidth + barGutter)), halfHeight, barWidth, (halfHeight * (bar / 100)));
-      });
-
-      drawing = false;
-    });
-  }
 }
 
 const init = () => {
@@ -407,68 +358,26 @@ const createWorld = () => {
   });    
 };
 
-// const countBlockRow = (row) => {
-//   let count = 0;
-//   for (let i = 0; i < placedBlocks[row].length; i++) {
-//     if (placedBlocks[row][i] === 1) {
-//       count++;
-//     }
-//   }
-//   return count;
-// }
-
 const createObjects = (type, block) => {
   const objType = [`small`, `med`, `large`];
 
   let loader = new THREE.GLTFLoader();
-  // if (type === `mountain`) {
-  // const blocksPlaced = countBlockRow(0);
-  // if (blocksPlaced % 2 === 0) {
   loader.load(`./assets/models/${type}/${type}-${objType[Math.floor(Math.random() * 3)]}.gltf`, function ( gltf ) {
     let item = gltf.scene.children[0];
-    item.position.x = Math.floor(Math.random() * (-5 - 8)) + 8;
-    item.position.z = Math.floor(Math.random() * (-5 - 8)) + 8;
+    item.position.x = Math.floor(Math.random() * (-4)) + 4;
+    item.position.z = Math.floor(Math.random() * (-4)) + 4;
+    item.position.y = 2;
     item.name = `${type}-${block}`
     console.log(`Add: `, item);
     scene.add(item);
   })
-  // }
-  // } else if (type === `flower`) {
-  //   loader.load(`./assets/models/${type}/${type}.gltf`, function ( gltf ) {
-  //     let item = gltf.scene.children[0];
-  //     item.position.x = Math.floor(Math.random() * (-5 - 8)) + 8;
-  //     item.position.z = Math.floor(Math.random() * (-5 - 8)) + 8;
-  //     item.name = `${type}-${block}`
-  //     console.log(item.name);
-  //     scene.add(item);
-  //   })
-  // } else {
-  //   loader.load(`./assets/models/${type}/${type}-${objType[Math.floor(Math.random() * 3)]}.gltf`, function ( gltf ) {
-  //     let item = gltf.scene.children[0];
-  //     item.position.x = Math.floor(Math.random() * (-5 - 8)) + 8;
-  //     item.position.z = Math.floor(Math.random() * (-5 - 8)) + 8;
-  //     item.name = `${type}-${block}`
-  //     console.log(item.name);
-  //     scene.add(item);
-  //     console.log(gltf.scene);
-  //   })
-  // }
 }
 
 const deleteObject = (type, block) => {
-  // if (type === `mountain`) {
-  // const blocksPlaced = countBlockRow(0);
-  // if (blocksPlaced % 2 > 0) {
-  // let item = scene.getObjectByName(`${type}-${block}`);
-  // scene.remove(item);
-  // }
-  // } else {
   console.log(type, block);
   let item = scene.getObjectByName(`${type}-${block}`);
   console.log(`Remove: `, item);
-  
   scene.remove(item);
-  // }
 }
 
 const loop = () => {
