@@ -3,6 +3,7 @@ let scene,
   WIDTH,
   HEIGHT,
   camera,
+  controls,
   fieldOfView,
   aspectRatio,
   nearPlane,
@@ -337,8 +338,8 @@ const createScene = () => {
   scene = new THREE.Scene();
   aspectRatio = WIDTH / HEIGHT;
   fieldOfView = 60;
-  nearPlane = 10;
-  farPlane = 10000;
+  nearPlane = 1;
+  farPlane = 1000;
 
   camera = new THREE.PerspectiveCamera(
     fieldOfView,
@@ -347,9 +348,15 @@ const createScene = () => {
     farPlane
   );
 
+  controls = new THREE.OrbitControls(camera)
+
   camera.position.set(11,5,11);
 
   camera.lookAt(new THREE.Vector3(0,0,0));
+
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 5;
+  controls.update();
 
   renderer = new THREE.WebGLRenderer({
     alpha: true,
@@ -466,14 +473,17 @@ const deleteObject = (type, block) => {
 
 const loop = () => {
   requestAnimationFrame(loop);
+  controls.update();
   renderer.render(scene, camera);
 };
 
 const transoformObj = (row, block) => {
-  let clock = new THREE.CLock();
+  let clock = new THREE.Clock();
 
   const objType = [`mountain`, `tree`, `flower`, `cloud`];
   let object = scene.getObjectByName(`${objType[row]}-${block}`);
+  console.log(object.scale);
+  
   
   var t = clock.getElapsedTime();
   
@@ -484,7 +494,7 @@ const transoformObj = (row, block) => {
   }
   else
   {
-    object.scale.z = 1+(t/.667);  
+    object.scale.z = 1+(t/.667);
   }
 };
 
