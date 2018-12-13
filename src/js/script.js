@@ -114,7 +114,7 @@ const changeBlock = (data) => {
         createObjects(type, keys[1])
       } else {
         console.log(`Remove Mountain nr:`, keys[1]);
-        deleteObject((type, keys[1]))
+        deleteObject(type, keys[1])
       }
     } else if (keys[0] == 1) {
       console.log(`Threes`)
@@ -124,7 +124,7 @@ const changeBlock = (data) => {
         createObjects(type, keys[1])
       } else {
         console.log(`Remove Three nr:`, keys[1]);
-        deleteObject((type, keys[1]))
+        deleteObject(type, keys[1])
       }
     } else if (keys[0] == 2) {
       console.log(`Flowers`)
@@ -134,7 +134,7 @@ const changeBlock = (data) => {
         createObjects(type, keys[1])
       } else {
         console.log(`Remove Flower`);
-        deleteObject((type, keys[1]))
+        deleteObject(type, keys[1])
       }
     } else if (keys[0] == 3) {
       console.log(`Clouds`)
@@ -144,7 +144,7 @@ const changeBlock = (data) => {
         createObjects(type, keys[1])
       } else {
         console.log(`Remove Cloud`);
-        deleteObject((type, keys[1]))
+        deleteObject(type, keys[1])
       }
     }
     //createTree();
@@ -316,7 +316,7 @@ const renderBars = () => {
 }
 
 const init = () => {
-  startPlaying();
+  //startPlaying();
   createScene();
   createLights();
   createWorld();
@@ -416,7 +416,7 @@ const createObjects = (type, block) => {
     item.position.x = Math.floor(Math.random() * (-5 - 8)) + 8;
     item.position.z = Math.floor(Math.random() * (-5 - 8)) + 8;
     item.name = `${type}-${block}`
-    console.log(item.name);
+    console.log(`Add: `, item);
     scene.add(item);
   })
   // }
@@ -450,7 +450,10 @@ const deleteObject = (type, block) => {
   // scene.remove(item);
   // }
   // } else {
+  console.log(type, block);
   let item = scene.getObjectByName(`${type}-${block}`);
+  console.log(`Remove: `, item);
+  
   scene.remove(item);
   // }
 }
