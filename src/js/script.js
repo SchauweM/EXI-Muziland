@@ -224,7 +224,6 @@ const startRecording = (buttonId) => {
 
       setTimeout(() => {
         mediaRecorder.stop();
-        isRecording = false;
         drawing = false;
         console.log(`stopped`);
         bars = [];
@@ -315,7 +314,14 @@ const renderBars = () => {
   }
 }
 
+const init = () => {
+  startPlaying();
+  createScene();
+  createLights();
+  createWorld();
   loop();
+  console.log(`hello world`);
+};
 
 const createScene = () => {
   WIDTH = window.innerWidth;
