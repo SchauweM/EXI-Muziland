@@ -34,10 +34,10 @@ let refreshIntervalId = null;
 let playSounds = null;
 let recordedSounds = [null, null, null, null];
 let placedBlocks = [
-  [1,0,0,0,0,0,0,0],
-  [0,0,0,1,0,0,0,0],
   [0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,1,0],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
 ]
 const blocks = 8;
 const rows = 4;
@@ -79,10 +79,10 @@ parser.on('data', (data) => {
       stopPlaying();
     }
   } else {
-    startScreen.style.visibility = `hidden`;
-    startScreen.style.opacity = `0`;
     if (recording === false) {
       startRecordHandler(Object.keys(dataconvert)[0]);
+      startScreen.style.visibility = `hidden`;
+      startScreen.style.opacity = `0`;
     } else {
       console.log(`already recording something`);
     }
@@ -287,9 +287,6 @@ const init = () => {
   createScene();
   createLights();
   createWorld();
-  createObjects(`mountain`, 0);
-  createObjects(`tree`, 3);
-  createObjects(`cloud`, 6);
   loop();
   console.log(`hello world`);
 };
