@@ -18,7 +18,7 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^3.0.7",
-    "electron-builder": "^20.38.2",
+    "electron-builder": "^20.38.3",
     "eslint": "^5.9.0",
     "eslint-watch": "^4.0.2"
   },
