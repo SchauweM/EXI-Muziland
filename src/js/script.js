@@ -31,7 +31,7 @@ let refreshIntervalId = null;
 let playSounds = null;
 let recordedSounds = [null, null, null, null];
 let placedBlocks = [
-  [1,0,1,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
@@ -259,11 +259,7 @@ const startPlaying = () => {
     } else {
       currentStep = 0;
     }
-<<<<<<< Updated upstream
   }, bpm); //90BPM
-=======
-  }, 500);
->>>>>>> Stashed changes
 }
 
 const stopPlaying = () => {
@@ -276,8 +272,6 @@ const init = () => {
   createScene();
   createLights();
   createWorld();
-  createObjects(`mountain`, 0);
-  createObjects(`mountain`, 2);
   loop();
   console.log(`hello world`);
 };
@@ -398,7 +392,7 @@ const transoformObj = (row, block) => {
   
   if (t >= .667)
   {
-    clock = new THREE.Clock;
+    clock = new THREE.Clock();
     object.scale.set(1,1,1);
   }
   else
