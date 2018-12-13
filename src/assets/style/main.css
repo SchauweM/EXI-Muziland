@@ -2,11 +2,13 @@ html {
   box-sizing: border-box;
   font-size: 67.5%;
   font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(#e4e0ba, #f7d9aa);
 }
 
 body {
   padding: 0;
   margin: 0;
+  color: white;
 }
 
 canvas {
@@ -16,13 +18,45 @@ canvas {
   z-index: 1;
 }
 
+.logo {
+  filter: drop-shadow(0px 0px 15px rgba(0, 0, 0, 0.5));
+}
+
+.canvas__boot {
+  text-align: center;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  position: absolute;
+  z-index: 99;
+  transition: all .3s;
+  background-color: rgba(255, 255, 255, .3)
+}
+
+.canvas__boot__ui {
+  margin: auto;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  flex-direction: column;
+  width: 100%;
+  justify-content: space-evenly;
+  font-size: 20px;
+  font-weight: bold;
+  text-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+}
+
+.instructions {
+  font-size: 32px;
+  text-shadow: 0px 0px 15px rgba(0, 0, 0, 1);
+}
+
 .canvas__game {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  background: linear-gradient(#e4e0ba, #f7d9aa);
 }
 
 .canvas__game__ui {
