@@ -158,7 +158,7 @@ const changeBlock = (data) => {
 const startRecordHandler = (key) => {
   recording = true;
   let buttonId = parseInt(key.replace('button-', ''));
-  canvasUi.innerHTML = `<div class='ui__countdown__container'><div class='countdown__timer'><h2>Maak een geluid in...</h2><p class='ui__countdown'>4</p></div></div>`;
+  canvasUi.innerHTML = `<div class='ui__countdown__container'><div class='countdown__timer'><h2>Maak een geluid of zeg iets in...</h2><p class='ui__countdown'>4</p></div></div>`;
 
   canvasUi.style.visibility = `visible`;
   canvasUi.style.opacity = `1`;
@@ -280,6 +280,7 @@ const stopPlaying = () => {
   startScreen.style.opacity = `1`;
   tableUI.style.visibility = `hidden`;
   tableUI.style.opacity = `0`;
+
 }
 
 const init = () => {
