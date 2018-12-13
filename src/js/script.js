@@ -1,3 +1,4 @@
+let clock = new THREE.Clock();
 
 let scene,
   WIDTH,
@@ -15,6 +16,8 @@ let shadowLight, ambientLight;
 
 const bpm = 667; //90BPM
 
+let loader = new THREE.GLTFLoader();
+
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
 const port = new SerialPort('/dev/cu.usbmodem14201', {
@@ -31,14 +34,17 @@ let refreshIntervalId = null;
 let playSounds = null;
 let recordedSounds = [null, null, null, null];
 let placedBlocks = [
+  [1,0,0,0,0,0,0,0],
+  [0,0,0,1,0,0,0,0],
   [0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,1,0],
 ]
-const steps = 8;
+const blocks = 8;
 const rows = 4;
-let currentStep = 0;
+let currentBlock = 0;
+
+let playingBlock, playingRow;
+
 const canvasUi = document.querySelector(`.canvas__game__ui`);
 const startScreen = document.querySelector(`.canvas__boot`);
 const tableUI = document.querySelector(`.table`);
@@ -90,70 +96,67 @@ const changeBlock = (data) => {
   for (let i = 0; i < Object.keys(data).length; i++) {
     const keys = Object.keys(data)[i].split(':');
     const value = data[Object.keys(data)[i]];
-    placedBlocks[keys[0]][keys[1]] = value;
-    let rowsss = document.querySelectorAll(`.table__row`);
-    let cellsInRow = rowsss[keys[0]].querySelectorAll('.table__cell');
+
+    //Fill UI with colors
+    let uiRows = document.querySelectorAll(`.table__row`);
+    let uiCellsinRows = uiRows[keys[0]].querySelectorAll('.table__cell');
     if (value === 0) {
-      cellsInRow[keys[1]].classList.remove(`blockinside`);
+      uiCellsinRows[keys[1]].classList.remove(`blockinside`);
     } else if (value === 1) {
-      cellsInRow[keys[1]].classList.add(`blockinside`);
+      uiCellsinRows[keys[1]].classList.add(`blockinside`);
     }
+
+    //Get placed blocks & add Object
+    placedBlocks[keys[0]][keys[1]] = value;
     console.log(`ROW ${keys[0]}: BLOCK ${keys[1]} - ON/OFF: ${value}`);
-    let type;
+
+    let objectType;
     if (keys[0] == 0) {
-      console.log(`Mountains`);
-      type = `mountain`;
+      objectType = `mountain`;
       if (value === 1) {
         console.log(`Create Mountain nr:`, keys[1]);
-        createObjects(type, keys[1])
+        createObjects(objectType, keys[1])
       } else {
         console.log(`Remove Mountain nr:`, keys[1]);
-        deleteObject(type, keys[1])
+        deleteObject(objectType, keys[1])
       }
     } else if (keys[0] == 1) {
-      console.log(`Trees`)
-      type = `tree`;
+      objectType = `tree`;
       if (value === 1) {
         console.log(`Create Tree nr:`, keys[1]);
-        createObjects(type, keys[1])
+        createObjects(objectType, keys[1])
       } else {
         console.log(`Remove Tree nr:`, keys[1]);
-        deleteObject(type, keys[1])
+        deleteObject(objectType, keys[1])
       }
     } else if (keys[0] == 2) {
-      console.log(`Flowers`)
-      type = `flower`
+      objectType = `flower`
       if (value === 1) {
         console.log(`Create Flower`);
-        createObjects(type, keys[1])
+        createObjects(objectType, keys[1])
       } else {
         console.log(`Remove Flower`);
-        deleteObject(type, keys[1])
+        deleteObject(objectType, keys[1])
       }
     } else if (keys[0] == 3) {
-      console.log(`Clouds`)
-      type = `cloud`
+      objectType = `cloud`
       if (value === 1) {
         console.log(`Create Cloud`);
-        createObjects(type, keys[1])
+        createObjects(objectType, keys[1])
       } else {
         console.log(`Remove Cloud`);
-        deleteObject(type, keys[1])
+        deleteObject(objectType, keys[1])
       }
     }
-    //createTree();
   }
+
   console.log(`Placed Blocks: `, placedBlocks);
-  // console.log(data);
 }
 
 const startRecordHandler = (key) => {
   recording = true;
   let buttonId = parseInt(key.replace('button-', ''));
   canvasUi.innerHTML = `<div class='ui__countdown__container'><div class='countdown__timer'><h2>Maak een geluid in...</h2><p class='ui__countdown'>4</p></div></div>`;
-
-  // waveform.style.visibility = `visible`;
-  // waveform.style.opacity = `1`;
 
   canvasUi.style.visibility = `visible`;
   canvasUi.style.opacity = `1`;
@@ -210,8 +213,6 @@ const startRecording = (buttonId) => {
         recording = false;
         canvasUi.style.visibility = `visible`;
         canvasUi.style.opacity = `0`;
-        // waveform.style.visibility = `hidden`;
-        // waveform.style.opacity = `0`;
         console.log(recordedSounds);
         console.log(buttonId);
         console.log(recordedSounds[parseInt(buttonId)].play())
@@ -227,27 +228,29 @@ const startRecording = (buttonId) => {
     });
 }
 
-const playCurrentColumn = (step) => {
+const playCurrentColumn = (currentBlock) => {
   //console.log(scene.getObjectByName('mountain- '));
-  for (let i = 0; i < rows; i++) {
-    let rowsss = document.querySelectorAll(`.table__row`);
-    let cellsInRow = rowsss[i].querySelectorAll('.table__cell');
-    for (let j = 0; j < steps; j++) {
-      cellsInRow[j].classList.remove('active');
+  for (let currentRow = 0; currentRow < rows; currentRow++) {
+    let uiRows = document.querySelectorAll(`.table__row`);
+    let uiCellsinRows = uiRows[currentRow].querySelectorAll('.table__cell');
+    for (let j = 0; j < blocks; j++) {
+      uiCellsinRows[j].classList.remove('active');
     }
-    cellsInRow[step].classList.add('active');
-    if (placedBlocks[i][step] === 1) {
-      let rowsss = document.querySelectorAll(`.table__row`);
-      let cellsInRow = rowsss[i].querySelectorAll('.table__cell');
-      cellsInRow[step].classList.add('active')
-      if (recordedSounds[i] !== null) {
-        console.log(`PLAYING WITH SOUND${step} + ${i}`);
-        recordedSounds[i].play();
+    uiCellsinRows[currentBlock].classList.add('active');
+    if (placedBlocks[currentRow][currentBlock] === 1) {
+      let uiRows = document.querySelectorAll(`.table__row`);
+      let uiCellsinRows = uiRows[currentRow].querySelectorAll('.table__cell');
+      uiCellsinRows[currentBlock].classList.add('active')
+      if (recordedSounds[currentRow] !== null) {
+        console.log(`PLAYING WITH SOUND${currentBlock} + ${currentRow}`);
+        recordedSounds[currentRow].play();
       }
-      console.log(`PLAYING ${step} + ${i}`);
-      transoformObj(i, step);
+      console.log(`PLAYING ${currentBlock} + ${currentRow}`);
+      playingRow = currentRow;
+      playingBlock = currentBlock;
+      //transoformObj(currentRow, currentBlock);
     } else {
-      console.log(`NOT PLAYING: ${step} + ${i}`);
+      console.log(`NOT PLAYING: ${currentBlock} + ${currentRow}`);
     }
   }
 }
@@ -258,12 +261,12 @@ const startPlaying = () => {
   tableUI.style.visibility = `visible`;
   tableUI.style.opacity = `1`;
   playSounds = setInterval(() => {
-    playCurrentColumn(currentStep);
-    console.log(currentStep);
-    if (currentStep < steps-1) {
-      currentStep++;
+    playCurrentColumn(currentBlock);
+    console.log(currentBlock);
+    if (currentBlock < blocks-1) {
+      currentBlock++;
     } else {
-      currentStep = 0;
+      currentBlock = 0;
     }
   }, bpm); //90BPM
 }
@@ -282,6 +285,9 @@ const init = () => {
   createScene();
   createLights();
   createWorld();
+  createObjects(`mountain`, 0);
+  createObjects(`tree`, 3);
+  createObjects(`cloud`, 6);
   loop();
   console.log(`hello world`);
 };
@@ -351,9 +357,6 @@ const createLights = () => {
 };
 
 const createWorld = () => {
-  //Inits GLTFLoader
-  let loader = new THREE.GLTFLoader();
-
   loader.load('./assets/models/island/island.gltf', function ( gltf ) {
     console.log(`loaded: `, gltf.scene.children[0]); 
     scene.add(gltf.scene.children[0]);      
@@ -362,24 +365,23 @@ const createWorld = () => {
   });    
 };
 
-const createObjects = (type, block) => {
+const createObjects = (objectType, block) => {
   const objType = [`small`, `med`, `large`];
 
-  let loader = new THREE.GLTFLoader();
-  loader.load(`./assets/models/${type}/${type}-${objType[Math.floor(Math.random() * 3)]}.gltf`, function ( gltf ) {
+  loader.load(`./assets/models/${objectType}/${objectType}-${objType[Math.floor(Math.random() * 3)]}.gltf`, function ( gltf ) {
     let item = gltf.scene.children[0];
     item.position.x = Math.floor(Math.random() * (-4)) + 4;
     item.position.z = Math.floor(Math.random() * (-4)) + 4;
     item.position.y = 2;
-    item.name = `${type}-${block}`
+    item.name = `${objectType}-${block}`
     console.log(`Add: `, item);
     scene.add(item);
   })
 }
 
-const deleteObject = (type, block) => {
-  console.log(type, block);
-  let item = scene.getObjectByName(`${type}-${block}`);
+const deleteObject = (objectType, block) => {
+  console.log(objectType, block);
+  let item = scene.getObjectByName(`${objectType}-${block}`);
   console.log(`Remove: `, item);
   scene.remove(item);
 }
@@ -387,28 +389,60 @@ const deleteObject = (type, block) => {
 const loop = () => {
   requestAnimationFrame(loop);
   controls.update();
+
+  if (playingBlock != undefined && playingRow != undefined) {
+    transoformObj();
+  }
+
   renderer.render(scene, camera);
+  
 };
 
-const transoformObj = (row, block) => {
-  let clock = new THREE.Clock();
+const transoformObj = () => {
+  //
+  let block = playingBlock;
+  let row = playingRow;
+
+  console.log(`KILL ME: `, block, row);
 
   const objType = [`mountain`, `tree`, `flower`, `cloud`];
   let object = scene.getObjectByName(`${objType[row]}-${block}`);
-  console.log(object.scale);
+  console.log(`${objType[row]}-${block} Obj Scale:`, object.scale);
   
   
-  var t = clock.getElapsedTime();
+  let t = clock.getElapsedTime();
   
-  if (t >= .667)
+  if (t >= 2.5)
   {
     clock = new THREE.Clock();
     object.scale.set(1,1,1);
   }
   else
   {
-    object.scale.z = 1+(t/.667);
+    object.scale.z = 0+(t/.667) / 2;
   }
+  
 };
+
+// const transoformObj = (row, block) => {
+//   let clock = new THREE.Clock();
+
+//   const objType = [`mountain`, `tree`, `flower`, `cloud`];
+//   let object = scene.getObjectByName(`${objType[row]}-${block}`);
+//   console.log(object.scale);
+  
+  
+//   var t = clock.getElapsedTime();
+  
+//   if (t >= .667)
+//   {
+//     clock = new THREE.Clock();
+//     object.scale.set(1,1,1);
+//   }
+//   else
+//   {
+//     object.scale.z = 1+(t/.667);
+//   }
+// };
 
 init();
