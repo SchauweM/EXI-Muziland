@@ -116,6 +116,11 @@ canvas {
 
 .table {
   width: 40%;
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 20px;
+  visibility: hidden;
+  opacity: 0;
 }
 
 .table__row {
@@ -127,7 +132,7 @@ canvas {
 }
 
 .table__cell {
-  border: 1px solid black;
+  border: 2px solid white;
   width: 5rem;
 }
 
@@ -136,11 +141,13 @@ canvas {
 }
 
 .blockinside {
-  background-color: green;
+  background-color: white;
+  padding: 5px;
 }
 
 .blockinside.active {
-  background-color: lime;
+  background-color: grey;
+  padding: 5px;
 }
 
 .playing {

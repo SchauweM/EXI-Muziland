@@ -41,6 +41,7 @@ const rows = 4;
 let currentStep = 0;
 const canvasUi = document.querySelector(`.canvas__game__ui`);
 const startScreen = document.querySelector(`.canvas__boot`);
+const tableUI = document.querySelector(`.table`);
 const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 const parserBlokken = portBlokken.pipe(new Readline( { delimiter: '\r\n' }));
 
@@ -254,6 +255,8 @@ const playCurrentColumn = (step) => {
 const startPlaying = () => {
   startScreen.style.visibility = `hidden`;
   startScreen.style.opacity = `0`;
+  tableUI.style.visibility = `visible`;
+  tableUI.style.opacity = `1`;
   playSounds = setInterval(() => {
     playCurrentColumn(currentStep);
     console.log(currentStep);
@@ -270,6 +273,8 @@ const stopPlaying = () => {
   playSounds = null;
   startScreen.style.visibility = `visible`;
   startScreen.style.opacity = `1`;
+  tableUI.style.visibility = `hidden`;
+  tableUI.style.opacity = `0`;
 }
 
 const init = () => {
