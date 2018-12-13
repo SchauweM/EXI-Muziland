@@ -7,13 +7,16 @@
     <link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet">
   </head>
   <body>
-    <div class="canvas__wrapper">
-      <div class="canvas__ui">
+    <div class="canvas__boot">
+    </div>
+    <div class="canvas__game">
+      <div class="canvas__game__ui">
       </div>
       <div class="waveform">
           <canvas class="js-canvas waveform__canvas"></canvas>
       </div>
-      <div id="world"></div>
+      <div id="boot"></div>
+      <div id="game"></div>
     </div>
     
     <script src="https://unpkg.com/wavesurfer.js"></script>
@@ -22,6 +25,7 @@
     <!-- <script src="./js/OrbitControls.js"></script> -->
     <script>
       // You can also require other files to run in this process
+      //require('./js/bootScreen.js')
       require('./js/script.js');
       //require("./js/world.js");
     </script>

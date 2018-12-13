@@ -16,7 +16,7 @@ canvas {
   z-index: 1;
 }
 
-.canvas__wrapper {
+.canvas__game {
   position: relative;
   display: flex;
   justify-content: center;
@@ -25,21 +25,29 @@ canvas {
   background: linear-gradient(#e4e0ba, #f7d9aa);
 }
 
-.canvas__ui {
+.canvas__game__ui {
   text-align: center;
-  height: 30%;
-  width: 60%;
-  margin: auto;
+  height: 100%;
+  width: 100%;
+  display: flex;
   position: absolute;
   z-index: 999;
   opacity: 0;
   visibility: hidden;
   transition: all .3s;
+  background-color: rgba(255, 255, 255, .3)
+}
+
+.ui__countdown__container {
+  margin: auto;
+  height: 30%;
+  width: 60%;
 }
 
 .ui__countdown {
   font-size: 6.4rem;
   font-weight: bolder;
+  margin-top: 0;
 }
 
 .waveform {
