@@ -396,7 +396,7 @@ const transoformObj = () => {
   let block = playingBlock;
   let row = playingRow;
 
-  const objType = [`mountain`, `tree`, `flower`, `cloud`];
+  const objType = [`cloud`, `flower`, `tree`, `mountain`];
   let object = scene.getObjectByName(`${objType[row]}-${block}`);
   
   let t = clock.getElapsedTime();
