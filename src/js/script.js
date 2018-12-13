@@ -265,12 +265,7 @@ const stopPlaying = () => {
   playSounds = null;
 }
 
-// const init = () => {
-//   startPlaying();
-//   // Create the scene and set the scene size.
-// }
-
-const processInput = audioProcessingEvent => {  
+const processInput = () => {  
   // Create a new Uint8Array to store the analyser's frequencyBinCount 
   const tempArray = new Uint8Array(analyser.frequencyBinCount);
 
@@ -321,7 +316,7 @@ const renderBars = () => {
 }
 
 const init = () => {
-  //startPlaying();
+  startPlaying();
   createScene();
   createLights();
   createWorld();
@@ -411,7 +406,6 @@ const countBlockRow = (row) => {
 
 const createObjects = (type, block) => {
   const objType = [`small`, `med`, `large`];
-  const objTypeOther = [`small`, `big`];
 
   let loader = new THREE.GLTFLoader();
   if (type === `mountain`) {
@@ -424,7 +418,6 @@ const createObjects = (type, block) => {
         item.name = `${type}-${block}`
         console.log(item.name);
         scene.add(item);
-        console.log(gltf.scene);
       })
     }
   } else if (type === `flower`) {
@@ -437,7 +430,7 @@ const createObjects = (type, block) => {
       scene.add(item);
     })
   } else {
-    loader.load(`./assets/models/${type}/${type}-${objTypeOther[Math.floor(Math.random() * 2)]}.gltf`, function ( gltf ) {
+    loader.load(`./assets/models/${type}/${type}-${objType[Math.floor(Math.random() * 3)]}.gltf`, function ( gltf ) {
       let item = gltf.scene.children[0];
       item.position.x = Math.floor(Math.random() * (-5 - 8)) + 8;
       item.position.z = Math.floor(Math.random() * (-5 - 8)) + 8;
@@ -446,19 +439,6 @@ const createObjects = (type, block) => {
       scene.add(item);
       console.log(gltf.scene);
     })
-  }
-}
-
-const deleteObject = (type, block) => {
-  if (type === `mountain`) {
-    const blocksPlaced = countBlockRow(0);
-    if (blocksPlaced % 2 > 0) {
-      let item = scene.getObjectByName(`${type}-${block}`);
-      scene.remove(item);
-    }
-  } else {
-    let item = scene.getObjectByName(`${type}-${block}`);
-    scene.remove(item);
   }
 }
 
