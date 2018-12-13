@@ -20,11 +20,11 @@ let loader = new THREE.GLTFLoader();
 
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
-const port = new SerialPort('/dev/cu.usbmodem14201', {
+const port = new SerialPort('/dev/cu.usbmodem14101', {
   baudRate: 9600
 });
-let playing = true;
-const portBlokken = new SerialPort('/dev/cu.usbmodem14101', {
+let playing = false;
+const portBlokken = new SerialPort('/dev/cu.usbmodem14201', {
   baudRate: 9600
 });
 let recording = false;
@@ -32,7 +32,7 @@ let recordingCountdownSeconds = 4;
 let secondsLeft = recordingCountdownSeconds;
 let refreshIntervalId = null;
 let playSounds = null;
-let recordedSounds = [null, null, null, null];
+let recordedSounds = [new Audio('./assets/sounds/hi-hat.wav'), new Audio('./assets/sounds/low-hat.wav'), new Audio('./assets/sounds/clap.wav'), new Audio('./assets/sounds/kick.wav')];
 let placedBlocks = [
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
@@ -156,6 +156,8 @@ const changeBlock = (data) => {
 }
 
 const startRecordHandler = (key) => {
+  clearInterval(playSounds);
+  playSounds = null;
   recording = true;
   let buttonId = parseInt(key.replace('button-', ''));
   canvasUi.innerHTML = `<div class='ui__countdown__container'><div class='countdown__timer'><h2>Maak een geluid of zeg iets in...</h2><p class='ui__countdown'>4</p></div></div>`;
@@ -223,15 +225,13 @@ const startRecording = (buttonId) => {
       setTimeout(() => {
         mediaRecorder.stop();
         console.log(`stopped`);
-        // bars = [];
+        startPlaying();
         scriptProcessor.onaudioprocess = null;
-        // renderBars(bars);
-      }, 1000);
+      }, 667);
     });
 }
 
 const playCurrentColumn = (currentBlock) => {
-  //console.log(scene.getObjectByName('mountain- '));
   for (let currentRow = 0; currentRow < rows; currentRow++) {
     let uiRows = document.querySelectorAll(`.table__row`);
     let uiCellsinRows = uiRows[currentRow].querySelectorAll('.table__cell');
@@ -276,6 +276,7 @@ const startPlaying = () => {
 const stopPlaying = () => {
   clearInterval(playSounds);
   playSounds = null;
+  recordedSounds = [new Audio('./assets/sounds/hi-hat.wav'), new Audio('./assets/sounds/low-hat.wav'), new Audio('./assets/sounds/clap.wav'), new Audio('./assets/sounds/kick.wav')];
   startScreen.style.visibility = `visible`;
   startScreen.style.opacity = `1`;
   tableUI.style.visibility = `hidden`;
@@ -284,7 +285,6 @@ const stopPlaying = () => {
 }
 
 const init = () => {
-  startPlaying();
   createScene();
   createLights();
   createWorld();
