@@ -79,6 +79,8 @@ parser.on('data', (data) => {
       stopPlaying();
     }
   } else {
+    startScreen.style.visibility = `hidden`;
+    startScreen.style.opacity = `0`;
     if (recording === false) {
       startRecordHandler(Object.keys(dataconvert)[0]);
     } else {
@@ -403,15 +405,10 @@ const transoformObj = () => {
   let block = playingBlock;
   let row = playingRow;
 
-  console.log(`KILL ME: `, block, row);
-
   const objType = [`mountain`, `tree`, `flower`, `cloud`];
   let object = scene.getObjectByName(`${objType[row]}-${block}`);
-  console.log(`${objType[row]}-${block} Obj Scale:`, object.scale);
-  
   
   let t = clock.getElapsedTime();
-  
   if (t >= 2.5)
   {
     clock = new THREE.Clock();
@@ -421,28 +418,6 @@ const transoformObj = () => {
   {
     object.scale.z = 0+(t/.667) / 2;
   }
-  
 };
-
-// const transoformObj = (row, block) => {
-//   let clock = new THREE.Clock();
-
-//   const objType = [`mountain`, `tree`, `flower`, `cloud`];
-//   let object = scene.getObjectByName(`${objType[row]}-${block}`);
-//   console.log(object.scale);
-  
-  
-//   var t = clock.getElapsedTime();
-  
-//   if (t >= .667)
-//   {
-//     clock = new THREE.Clock();
-//     object.scale.set(1,1,1);
-//   }
-//   else
-//   {
-//     object.scale.z = 1+(t/.667);
-//   }
-// };
 
 init();
