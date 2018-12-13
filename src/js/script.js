@@ -315,7 +315,7 @@ const renderBars = () => {
 }
 
 const init = () => {
-  startPlaying();
+  //startPlaying();
   createScene();
   createLights();
   createWorld();
@@ -387,7 +387,7 @@ const createWorld = () => {
 
   loader.load('./assets/models/island/island.gltf', function ( gltf ) {
     console.log(`loaded: `, gltf.scene.children[0]); 
-    scene.add(gltf.scene.children[0]);    
+    scene.add(gltf.scene.children[0]);      
   }, undefined, function ( error ) {
     console.error(`Not loaded:`, error );
   });    
@@ -403,8 +403,10 @@ const createObjects = (type, block) => {
     item.position.x = Math.floor(Math.random() * (-5 - 8)) + 8;
     item.position.z = Math.floor(Math.random() * (-5 - 8)) + 8;
     item.name = `${type}-${block}`
-    console.log(item.name);
+    console.log(`Added Item: `, item.name);
     scene.add(item);
+    console.log(scene);
+    
   })
 }
 
