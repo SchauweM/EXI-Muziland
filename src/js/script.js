@@ -315,14 +315,7 @@ const renderBars = () => {
   }
 }
 
-const init = () => {
-  // startPlaying();
-  createScene();
-  createLights();
-  createWorld();
   loop();
-  console.log(`hello world`);
-};
 
 const createScene = () => {
   WIDTH = window.innerWidth;
