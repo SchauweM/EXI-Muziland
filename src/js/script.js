@@ -113,6 +113,7 @@ const changeBlock = (data) => {
         createObjects(type, keys[1])
       } else {
         console.log(`Remove Mountain nr:`, keys[1]);
+        deleteObject((type, keys[1]))
       }
     } else if (keys[0] == 1) {
       console.log(`Threes`)
@@ -122,6 +123,7 @@ const changeBlock = (data) => {
         createObjects(type, keys[1])
       } else {
         console.log(`Remove Three nr:`, keys[1]);
+        deleteObject((type, keys[1]))
       }
     } else if (keys[0] == 2) {
       console.log(`Flowers`)
@@ -131,6 +133,7 @@ const changeBlock = (data) => {
         createObjects(type, keys[1])
       } else {
         console.log(`Remove Flower`);
+        deleteObject((type, keys[1]))
       }
     } else if (keys[0] == 3) {
       console.log(`Clouds`)
@@ -140,6 +143,7 @@ const changeBlock = (data) => {
         createObjects(type, keys[1])
       } else {
         console.log(`Remove Cloud`);
+        deleteObject((type, keys[1]))
       }
     }
     //createTree();
@@ -391,11 +395,11 @@ const createWorld = () => {
 };
 
 const createObjects = (type, block) => {
-  console.log(type, block);
+  const objType = [`small`, `med`, `large`];
 
   let loader = new THREE.GLTFLoader();
   
-  loader.load(`./assets/models/${type}/${type}-${block}.gltf`, function ( gltf ) {
+  loader.load(`./assets/models/${type}/${type}-${objType[Math.floor(Math.random() * 3)]}.gltf`, function ( gltf ) {
     let item = gltf.scene.children[0];
     item.position.x = Math.floor(Math.random() * (-5 - 8)) + 8;
     item.position.z = Math.floor(Math.random() * (-5 - 8)) + 8;
@@ -403,6 +407,11 @@ const createObjects = (type, block) => {
     console.log(item.name);
     scene.add(item);
   })
+}
+
+const deleteObject = (type, block) => {
+  let item = scene.getObjectByName(`${type}-${block}`);
+  scene.remove(item);
 }
 
 const loop = () => {
