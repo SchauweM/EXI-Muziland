@@ -14,7 +14,7 @@ let scene,
 
 let shadowLight, ambientLight;
 
-const bpm = 667; //90BPM
+const bpm = 500; //90BPM
 
 let loader = new THREE.GLTFLoader();
 
@@ -114,39 +114,31 @@ const changeBlock = (data) => {
 
     let objectType;
     if (keys[0] == 0) {
-      objectType = `mountain`;
+      objectType = `cloud`;
       if (value === 1) {
-        console.log(`Create Mountain nr:`, keys[1]);
         createObjects(objectType, keys[1])
       } else {
-        console.log(`Remove Mountain nr:`, keys[1]);
         deleteObject(objectType, keys[1])
       }
     } else if (keys[0] == 1) {
-      objectType = `tree`;
+      objectType = `flower`;
       if (value === 1) {
-        console.log(`Create Tree nr:`, keys[1]);
         createObjects(objectType, keys[1])
       } else {
-        console.log(`Remove Tree nr:`, keys[1]);
         deleteObject(objectType, keys[1])
       }
     } else if (keys[0] == 2) {
-      objectType = `flower`
+      objectType = `tree`
       if (value === 1) {
-        console.log(`Create Flower`);
         createObjects(objectType, keys[1])
       } else {
-        console.log(`Remove Flower`);
         deleteObject(objectType, keys[1])
       }
     } else if (keys[0] == 3) {
-      objectType = `cloud`
+      objectType = `mountain`
       if (value === 1) {
-        console.log(`Create Cloud`);
         createObjects(objectType, keys[1])
       } else {
-        console.log(`Remove Cloud`);
         deleteObject(objectType, keys[1])
       }
     }
@@ -223,15 +215,12 @@ const startRecording = (buttonId) => {
       setTimeout(() => {
         mediaRecorder.stop();
         console.log(`stopped`);
-        // bars = [];
         scriptProcessor.onaudioprocess = null;
-        // renderBars(bars);
       }, 1000);
     });
 }
 
 const playCurrentColumn = (currentBlock) => {
-  //console.log(scene.getObjectByName('mountain- '));
   for (let currentRow = 0; currentRow < rows; currentRow++) {
     let uiRows = document.querySelectorAll(`.table__row`);
     let uiCellsinRows = uiRows[currentRow].querySelectorAll('.table__cell');
@@ -414,7 +403,7 @@ const transoformObj = () => {
   }
   else
   {
-    object.scale.z = 0+(t/.667) / 2;
+    object.scale.z = 0+(t/.500) / 2;
   }
 };
 
