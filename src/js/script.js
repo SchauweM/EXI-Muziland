@@ -12,6 +12,8 @@ let scene,
 
 let shadowLight, ambientLight;
 
+const bpm = 667; //90BPM
+
 const SerialPort = require('serialport');
 const Readline = require('@serialport/parser-readline');
 const port = new SerialPort('/dev/cu.usbmodem143220', {
@@ -27,7 +29,7 @@ let refreshIntervalId = null;
 let playSounds = null;
 let recordedSounds = [null, null, null, null];
 let placedBlocks = [
-  [0,0,0,0,0,0,0,0],
+  [1,0,1,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
@@ -138,7 +140,7 @@ const changeBlock = (data) => {
       }
     } else if (keys[0] == 3) {
       console.log(`Clouds`)
-      type = `flower`
+      type = `cloud`
       if (value === 1) {
         console.log(`Create Cloud`);
         createObjects(type, keys[1])
@@ -239,11 +241,13 @@ const playCurrentColumn = (step) => {
   for (let i = 0; i < rows; i++) {
     if (placedBlocks[i][step] === 1) {
       if (recordedSounds[i] !== null) {
-        console.log(`playing ${step} + ${i}`);
+        console.log(`PLAYING WITH SOUND${step} + ${i}`);
         recordedSounds[i].play();
       }
+      console.log(`PLAYING ${step} + ${i}`);
+      transoformObj(i, step);
     } else {
-      console.log(`no sound: ${step} + ${i}`);
+      console.log(`NOT PLAYING: ${step} + ${i}`);
     }
   }
 }
@@ -257,7 +261,7 @@ const startPlaying = () => {
     } else {
       currentStep = 0;
     }
-  }, 1000);
+  }, bpm); //90BPM
 }
 
 const stopPlaying = () => {
@@ -316,10 +320,12 @@ const renderBars = () => {
 }
 
 const init = () => {
-  //startPlaying();
+  startPlaying();
   createScene();
   createLights();
   createWorld();
+  createObjects(`mountain`, 0);
+  createObjects(`mountain`, 2);
   loop();
   console.log(`hello world`);
 };
@@ -461,6 +467,25 @@ const deleteObject = (type, block) => {
 const loop = () => {
   requestAnimationFrame(loop);
   renderer.render(scene, camera);
+};
+
+const transoformObj = (row, block) => {
+  let clock = new THREE.CLock();
+
+  const objType = [`mountain`, `tree`, `flower`, `cloud`];
+  let object = scene.getObjectByName(`${objType[row]}-${block}`);
+  
+  var t = clock.getElapsedTime();
+  
+  if (t >= .667)
+  {
+    clock = new THREE.Clock;
+    object.scale.set(1,1,1);
+  }
+  else
+  {
+    object.scale.z = 1+(t/.667);  
+  }
 };
 
 init();
