@@ -14,7 +14,7 @@ let scene,
 
 let shadowLight, ambientLight;
 
-const bpm = 500; //90BPM
+const bpm = 667; //90BPM
 
 let loader = new THREE.GLTFLoader();
 
@@ -32,7 +32,7 @@ let recordingCountdownSeconds = 4;
 let secondsLeft = recordingCountdownSeconds;
 let refreshIntervalId = null;
 let playSounds = null;
-let recordedSounds = [new Audio('./assets/sounds/hi-hat.wav'), new Audio('./assets/sounds/low-hat.wav'), new Audio('./assets/sounds/clap.wav'), new Audio('./assets/sounds/kick.wav')];
+let recordedSounds = [new Audio('./assets/sounds/hi-hat.wav'), new Audio('./assets/sounds/low-hat.wav'), new Audio('./assets/sounds/clap.wav'), new Audio('./assets/sounds/kek.wav')];
 let placedBlocks = [
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],
@@ -80,9 +80,11 @@ parser.on('data', (data) => {
     }
   } else {
     if (recording === false) {
-      startRecordHandler(Object.keys(dataconvert)[0]);
-      startScreen.style.visibility = `hidden`;
-      startScreen.style.opacity = `0`;
+      if (recordedSounds !== null) {
+        startRecordHandler(Object.keys(dataconvert)[0]);
+        startScreen.style.visibility = `hidden`;
+        startScreen.style.opacity = `0`;
+      }
     } else {
       console.log(`already recording something`);
     }
@@ -152,7 +154,7 @@ const startRecordHandler = (key) => {
   playSounds = null;
   recording = true;
   let buttonId = parseInt(key.replace('button-', ''));
-  canvasUi.innerHTML = `<div class='ui__countdown__container'><div class='countdown__timer'><h2>Maak een geluid of zeg iets in...</h2><p class='ui__countdown'>4</p></div></div>`;
+  canvasUi.innerHTML = `<div class='ui__countdown__container'><div class='countdown__timer'><h2>Maak een geluid of zeg iets in de microfoon aan de rechter kant...</h2><p class='ui__countdown'>4</p></div></div>`;
 
   canvasUi.style.visibility = `visible`;
   canvasUi.style.opacity = `1`;
@@ -220,7 +222,7 @@ const startRecording = (buttonId) => {
         startPlaying();
         scriptProcessor.onaudioprocess = null;
         // renderBars(bars);
-      }, 500);
+      }, bpm);
     });
 }
 
@@ -267,14 +269,15 @@ const startPlaying = () => {
 }
 
 const stopPlaying = () => {
-  clearInterval(playSounds);
-  playSounds = null;
-  recordedSounds = [new Audio('./assets/sounds/hi-hat.wav'), new Audio('./assets/sounds/low-hat.wav'), new Audio('./assets/sounds/clap.wav'), new Audio('./assets/sounds/kick.wav')];
-  startScreen.style.visibility = `visible`;
-  startScreen.style.opacity = `1`;
-  tableUI.style.visibility = `hidden`;
-  tableUI.style.opacity = `0`;
-
+  if (!recording) {
+    clearInterval(playSounds);
+    playSounds = null;
+    recordedSounds = [new Audio('./assets/sounds/hi-hat.wav'), new Audio('./assets/sounds/low-hat.wav'), new Audio('./assets/sounds/clap.wav'), new Audio('./assets/sounds/kick.wav')];
+    startScreen.style.visibility = `visible`;
+    startScreen.style.opacity = `1`;
+    tableUI.style.visibility = `hidden`;
+    tableUI.style.opacity = `0`;
+  }
 }
 
 const init = () => {
@@ -407,7 +410,7 @@ const transoformObj = () => {
   }
   else
   {
-    object.scale.z = 0+(t/.500) / 2;
+    object.scale.z = 0+(t/(bpm/1000)) / 2;
   }
 };
 
