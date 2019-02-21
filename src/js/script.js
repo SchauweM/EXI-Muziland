@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 let clock = new THREE.Clock();
 
 let scene,
@@ -14,7 +15,7 @@ let scene,
 
 let shadowLight, ambientLight;
 
-const bpm = 667; //90BPM
+const bpm = 480; //125BPM
 
 let loader = new THREE.GLTFLoader();
 
@@ -403,15 +404,19 @@ const transoformObj = () => {
   let object = scene.getObjectByName(`${objType[row]}-${block}`);
   
   let t = clock.getElapsedTime();
-  if (t >= 2.5)
-  {
-    clock = new THREE.Clock();
-    object.scale.set(1,1,1);
+
+  if (object !== undefined)  {
+    if (t >= 2.5)
+    {
+      clock = new THREE.Clock();
+      object.scale.set(1,1,1);
+    }
+    else
+    {
+      object.scale.z = 0+(t/(bpm/1000)) / 2;
+    }
   }
-  else
-  {
-    object.scale.z = 0+(t/(bpm/1000)) / 2;
-  }
+  
 };
 
 init();

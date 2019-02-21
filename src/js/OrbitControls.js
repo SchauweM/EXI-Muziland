@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * @author qiao / https://github.com/qiao
  * @author mrdoob / http://mrdoob.com
@@ -511,11 +512,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
   }
 
-  function handleMouseUp( event ) {
+  // function handleMouseUp( event ) {
 
-    // console.log( 'handleMouseUp' );
+  //   // console.log( 'handleMouseUp' );
 
-  }
+  // }
 
   function handleMouseWheel( event ) {
 
@@ -659,11 +660,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
   }
 
-  function handleTouchEnd( event ) {
+  // function handleTouchEnd( event ) {
 
-    //console.log( 'handleTouchEnd' );
+  //   //console.log( 'handleTouchEnd' );
 
-  }
+  // }
 
   //
   // event handlers - FSM: listen for events and reset state
