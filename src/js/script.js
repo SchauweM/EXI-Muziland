@@ -387,16 +387,13 @@ const loop = () => {
   requestAnimationFrame(loop);
   controls.update();
 
-  if (playingBlock != null && playingRow != null) {
+  if ((playingBlock != null || playingBlock != undefined) && (playingRow != null || playingRow != undefined)) {
     transoformObj();
   }
-
   renderer.render(scene, camera);
-  
 };
 
 const transoformObj = () => {
-  //
   let block = playingBlock;
   let row = playingRow;
 
