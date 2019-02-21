@@ -214,7 +214,9 @@ const startRecording = (buttonId) => {
         canvasUi.style.opacity = `0`;
         console.log(recordedSounds);
         console.log(buttonId);
-        console.log(recordedSounds[parseInt(buttonId)].play())
+        recordedSounds[parseInt(buttonId)].pause();
+        recordedSounds[parseInt(buttonId)].currentTime = 0;
+        recordedSounds[parseInt(buttonId)].play();
       });
 
       setTimeout(() => {
@@ -367,9 +369,9 @@ const createObjects = (objectType, block) => {
 
   loader.load(`./assets/models/${objectType}/${objectType}-${objType[Math.floor(Math.random() * 3)]}.gltf`, function ( gltf ) {
     let item = gltf.scene.children[0];
-    item.position.x = Math.floor(Math.random() * (-4)) + 4;
-    item.position.z = Math.floor(Math.random() * (-4)) + 4;
-    item.position.y = 2;
+    item.position.x = Math.floor(Math.random() * (-6)) + 4;
+    item.position.z = Math.floor(Math.random() * (-5)) + 4;
+    item.position.y = 1.9;
     item.name = `${objectType}-${block}`
     console.log(`Add: `, item);
     scene.add(item);

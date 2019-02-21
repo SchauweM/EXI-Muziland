@@ -5,7 +5,7 @@ app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 800, height: 600})
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
   // and load the index.html of the app.
   mainWindow.loadFile('./src/index.html')
 

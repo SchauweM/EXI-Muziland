@@ -4,7 +4,15 @@
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
-    "start": "electron . ews"
+    "start": "electron . ews",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "Muziland",
+    "mac": {
+      "category": "Games"
+    }
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
@@ -20,10 +28,10 @@
     "electron": "^3.0.7",
     "electron-builder": "^20.38.3",
     "eslint": "^5.9.0",
-    "eslint-watch": "^4.0.2"
+    "eslint-watch": "^4.0.2",
+    "electron-rebuild": "^1.8.2"
   },
   "dependencies": {
-    "electron-rebuild": "^1.8.2",
     "serialport": "^7.0.2"
   }
 }
