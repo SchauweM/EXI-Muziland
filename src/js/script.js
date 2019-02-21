@@ -33,7 +33,7 @@ let recordingCountdownSeconds = 4;
 let secondsLeft = recordingCountdownSeconds;
 let refreshIntervalId = null;
 let playSounds = null;
-let recordedSounds = [new Audio('./assets/sounds/hi-hat.wav'), new Audio('./assets/sounds/low-hat.wav'), new Audio('./assets/sounds/clap.wav'), new Audio('./assets/sounds/kek.wav')];
+let recordedSounds = [new Audio('./assets/sounds/hi-hat.wav'), new Audio('./assets/sounds/low-hat.wav'), new Audio('./assets/sounds/clap.wav'), new Audio('./assets/sounds/kick.wav')];
 let placedBlocks = [
   [0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0],

@@ -26,6 +26,10 @@ canvas {
   filter: drop-shadow(0px 0px 15px rgba(0, 0, 0, 0.5));
 }
 
+.heading {
+  width: 80%;
+}
+
 .canvas__boot {
   text-align: center;
   height: 100%;
@@ -45,13 +49,13 @@ canvas {
   flex-direction: column;
   width: 100%;
   justify-content: space-evenly;
-  font-size: 20px;
+  font-size: 2.6rem;
   font-weight: bold;
   text-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
 }
 
 .instructions {
-  font-size: 32px;
+  font-size: 3.6rem;
   text-shadow: 0px 0px 15px rgba(0, 0, 0, 1);
 }
 
